@@ -1,0 +1,19 @@
+@using Microsoft.AspNetCore.Components
+
+<div class="@("flex shrink-0 items-center justify-center rounded-full font-fredoka font-semibold " + BackgroundClass + " " + TextClass + " " + SizeClass)" aria-hidden="true">
+    @Initials
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Initials { get; set; } = string.Empty;
+
+    [Parameter]
+    public string BackgroundClass { get; set; } = "bg-[#F2937A]";
+
+    [Parameter]
+    public string TextClass { get; set; } = "text-white";
+
+    [Parameter]
+    public string SizeClass { get; set; } = "size-10 text-base";
+}
