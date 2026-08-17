@@ -25,3 +25,4 @@
 ## Spec Driven Development - Skills
 - /spec usaremos esta habilidad para crear las especificaciones.
 - /spec-impl Usaremos esta skill para hacer las implementaciones.
+- El subagente `spec-acceptance-verifier` verifica, corrige y actualiza los criterios de aceptación de un spec. Para criterios de .NET o Blazor consulta Context7 y, para criterios de interfaz, usa Playwright y guarda los artefactos en `.playwright-mcp/`.
