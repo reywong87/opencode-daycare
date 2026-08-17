@@ -1,7 +1,55 @@
-﻿@page "/"
+@page "/"
+@using OpenDaycare.Components.Shared
 
-<PageTitle>Home</PageTitle>
+<PageTitle>OpenDayCare</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="mx-auto w-full max-w-[760px] px-5 py-8 md:px-10 md:pb-20 md:pt-[34px]">
+    <header class="mb-6">
+        <p class="mb-1 text-[12.5px] font-extrabold tracking-[0.8px] text-[#D9583C]">GUARDERÍA · SALA SOLES</p>
+        <h1 class="font-fredoka text-[30px] font-semibold text-[#3F362E]">Buenas, Caro</h1>
+        <p class="mt-1 text-[14.5px] text-[#94887B]">12 niños · martes 17 jun</p>
+    </header>
 
-Welcome to your new app.
+    <button type="button" class="mb-6 flex w-full items-center gap-3.5 rounded-[18px] border border-[#ECE0D0] bg-[#FFFDF9] px-[18px] py-3.5 text-left shadow-[0_4px_14px_-10px_rgba(120,90,60,0.4)]">
+        <Avatar Initials="C" BackgroundClass="bg-[#F2937A]" TextClass="text-white" SizeClass="size-10 text-base" />
+        <span class="flex-1 text-[15px] text-[#A89A8B]">Compartí un momento…</span>
+        <span class="flex size-[38px] items-center justify-center rounded-xl bg-[#FBE3D8] text-[#E0654A]">
+            <svg class="size-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+            </svg>
+        </span>
+    </button>
+
+    <div class="mb-3.5 flex items-center gap-3.5">
+        <span class="text-[12.5px] font-extrabold tracking-[0.8px] text-[#8A7C6D]">PUBLICADO HOY</span>
+        <span class="h-px flex-1 bg-[#E7DAC8]"></span>
+    </div>
+
+    <section class="flex flex-col gap-4" aria-label="Publicaciones de hoy">
+        <PostCard Title="Mateo"
+                  Subtitle="14:20 · publicado por vos"
+                  Kind="Logro"
+                  Recipient="familia de Mateo"
+                  Message="¡Usó el orinal solito por primera vez! Estaba feliz de contárselo a todos. Un gran paso."
+                  ReactionCount="3"
+                  CommentCount="1" />
+
+        <PostCard Title="Mateo"
+                  Subtitle="09:40 · publicado por vos"
+                  Kind="Actividad"
+                  Recipient="familia de Mateo"
+                  Message="Pintamos con témperas esta mañana. Mateo eligió el azul para todo y se concentró un montón mezclando colores."
+                  ImageLabel="Foto · pintando con témperas"
+                  ReactionCount="5"
+                  CommentCount="2" />
+
+        <PostCard Title="Anuncio general"
+                  Subtitle="07:50 · publicado por vos"
+                  Kind="Anuncio"
+                  Recipient="toda la sala"
+                  Message="El viernes salimos al parque por la mañana. Recuerden mandar gorra y una botellita de agua."
+                  ReactionCount="8"
+                  CommentCount="0" />
+    </section>
+</div>
