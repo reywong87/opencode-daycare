@@ -20,3 +20,8 @@
 
 ## MCP
 - Playwright screenshots and whatever things related to playwright must be in the .playwright-mcp folder. 
+- Context7 We use this MCP to read the framework documentation
+
+## Spec Driven Development - Skills
+- /spec usaremos esta habilidad para crear las especificaciones.
+- /spec-impl Usaremos esta skill para hacer las implementaciones.
