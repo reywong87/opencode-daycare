@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@source "../Components";
+
+@theme {
+  --font-fredoka: "Fredoka", system-ui, sans-serif;
+  --font-nunito: "Nunito", system-ui, sans-serif;
+}
+
+@layer base {
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: #f6ecdf;
+    color: #3f362e;
+    font-family: var(--font-nunito);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 8px;
+    background: #e4d6c4;
+    background-clip: content-box;
+  }
+}
