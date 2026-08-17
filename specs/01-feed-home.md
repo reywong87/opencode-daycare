@@ -1,6 +1,6 @@
 # SPEC 01 — Home de feed con Tailwind
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** Ninguna
 > **Date:** 2026-08-16
 > **Objective:** Reemplazar el home inicial por un feed estático que reproduzca el mockup proporcionado con Tailwind CSS y componentes Blazor reutilizables.
@@ -50,16 +50,16 @@ Las interfaces visuales serán:
 
 ## Acceptance criteria
 
-- [ ] `npm install` instala las dependencias de Tailwind y `npm run build:css` genera `wwwroot/app.css` sin errores.
-- [ ] `dotnet build` termina sin errores después de generar el CSS.
-- [ ] `Components/App.razor` no carga Bootstrap y carga Fredoka y Nunito desde Google Fonts.
-- [ ] A 1440px de ancho, el home muestra el sidebar fijo de 248px, el feed centrado y los tres posts estáticos con la jerarquía visual, colores, tipografías y placeholder del mockup.
-- [ ] A 390px de ancho, el sidebar no ocupa espacio permanente, se muestra una barra superior con logo y menú, y el feed continúa siendo legible.
-- [ ] En móvil, el botón de menú abre el panel lateral sobre el feed y tocar el overlay lo cierra.
-- [ ] Los enlaces y botones de publicación, edición, reacciones, comentarios y cierre de sesión no navegan a rutas inexistentes ni cambian datos.
-- [ ] Los iconos del home y sidebar se renderizan como SVG inline sin una biblioteca externa de iconos.
-- [ ] Al recargar el home, se mantiene el mismo contenido estático y no se realiza ninguna solicitud de autenticación, API o persistencia.
-- [ ] `Counter` y `Weather` conservan su contenido actual dentro del nuevo layout y no reciben rediseño de contenido.
+- [x] `npm install` instala las dependencias de Tailwind y `npm run build:css` genera `wwwroot/app.css` sin errores.
+- [x] `dotnet build` termina sin errores después de generar el CSS.
+- [x] `Components/App.razor` no carga Bootstrap y carga Fredoka y Nunito desde Google Fonts.
+- [x] A 1440px de ancho, el home muestra el sidebar fijo de 248px, el feed centrado y los tres posts estáticos con la jerarquía visual, colores, tipografías y placeholder del mockup.
+- [x] A 390px de ancho, el sidebar no ocupa espacio permanente, se muestra una barra superior con logo y menú, y el feed continúa siendo legible.
+- [x] En móvil, el botón de menú abre el panel lateral sobre el feed y tocar el overlay lo cierra.
+- [x] Los enlaces y botones de publicación, edición, reacciones, comentarios y cierre de sesión no navegan a rutas inexistentes ni cambian datos.
+- [x] Los iconos del home y sidebar se renderizan como SVG inline sin una biblioteca externa de iconos.
+- [x] Al recargar el home, se mantiene el mismo contenido estático y no se realiza ninguna solicitud de autenticación, API o persistencia.
+- [x] `Counter` y `Weather` conservan su contenido actual dentro del nuevo layout y no reciben rediseño de contenido.
 
 ## Decisions
 
