@@ -30,4 +30,8 @@
     background: #e4d6c4;
     background-clip: content-box;
   }
+
+  #blazor-error-ui {
+    display: none;
+  }
 }
