@@ -18,3 +18,6 @@ coverage/
 
 # Local tool output
 .playwright-mcp/*
+
+# Node.js dependencies
+node_modules/
