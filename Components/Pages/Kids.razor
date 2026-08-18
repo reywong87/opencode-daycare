@@ -1,0 +1,57 @@
+@page "/kids"
+@rendermode InteractiveServer
+@using OpenDaycare.Components.Shared
+
+<PageTitle>Niños | OpenDayCare</PageTitle>
+
+<div class="mx-auto w-full max-w-[880px] px-5 py-8 md:px-10 md:pb-20 md:pt-[34px]">
+    <header class="mb-[22px] flex items-end justify-between gap-4">
+        <div>
+            <p class="mb-1 text-[12.5px] font-extrabold tracking-[0.8px] text-[#D9583C]">GESTIÓN</p>
+            <h1 class="font-fredoka text-[30px] font-semibold text-[#3F362E]">Niños</h1>
+        </div>
+        <button type="button" class="flex items-center gap-2 rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]">
+            <svg class="size-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+            </svg>
+            Agregar niño
+        </button>
+    </header>
+
+    <div class="mb-[22px] flex items-center gap-[11px] rounded-[14px] border border-[#ECE0D0] bg-[#FFFDF9] px-4 py-3">
+        <svg class="size-[18px] shrink-0 text-[#B0A290]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input @bind="searchTerm" @bind:event="oninput" class="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B]" placeholder="Buscar niño…" aria-label="Buscar niño" />
+    </div>
+
+    <div class="mb-3.5 flex items-center gap-3">
+        <span class="text-[12.5px] font-extrabold tracking-[0.8px] text-[#3F362E]">SALA SOLES</span>
+        <span class="text-[13px] text-[#A89A8B]">@FilteredKids.Count niños</span>
+        <span class="h-px flex-1 bg-[#E7DAC8]"></span>
+    </div>
+
+    @if (FilteredKids.Count == 0)
+    {
+        <p class="rounded-[18px] border border-dashed border-[#D8CBBA] bg-[#FFFDF9] px-5 py-8 text-center text-[15px] font-semibold text-[#94887B]">No se encontraron niños</p>
+    }
+    else
+    {
+        <section class="grid gap-3.5 sm:grid-cols-2" aria-label="Niños de Sala Soles">
+            @foreach (var kid in FilteredKids)
+            {
+                <KidCard Kid="kid" />
+            }
+        </section>
+    }
+</div>
+
+@code {
+    private string searchTerm = string.Empty;
+
+    private IReadOnlyList<Kid> FilteredKids => string.IsNullOrWhiteSpace(searchTerm)
+        ? KidCatalog.All
+        : KidCatalog.All.Where(kid => kid.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToArray();
+
+}
