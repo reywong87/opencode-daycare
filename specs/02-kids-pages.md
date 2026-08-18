@@ -9,7 +9,8 @@
 
 **In:**
 
-- Crear la página `Components/Pages/Kids.razor` para la ruta `/kids` con el encabezado, botón visual de agregar, buscador y cuadrícula de ocho niños del mockup.
+- Crear el componente reutilizable `Components/Shared/KidCard.razor` para renderizar cada tarjeta de niño.
+- Crear la página `Components/Pages/Kids.razor` para la ruta `/kids` con el encabezado, botón visual de agregar, buscador y cuadrícula de ocho `KidCard`.
 - Crear la página `Components/Pages/KidProfile.razor` para la ruta `/kids/[slug]` con el perfil completo de cada niño conocido.
 - Centralizar los datos demo en `Components/Shared/KidCatalog.cs` para que listado y perfiles compartan nombres, slugs, avatares, edades, alertas, fechas y padres vinculados.
 - Implementar el filtrado local, sin distinción entre mayúsculas y minúsculas, por nombre completo desde el buscador de `/kids`.
@@ -71,8 +72,8 @@ El catálogo declara exactamente ocho niños: Mateo Fernández, Sofía Méndez, 
 ## Implementation plan
 
 1. Crear `Components/Shared/KidCatalog.cs` con `Kid`, `LinkedParent`, los ocho registros demo y el acceso por slug; verificar que el proyecto compila.
-2. Crear `Components/Pages/Kids.razor` con la ruta `/kids`, las tarjetas basadas en `KidCatalog`, avatares mediante el componente `Avatar` existente y enlaces hacia cada perfil; verificar que `/kids` renderiza los ocho niños.
-3. Añadir el estado interactivo del buscador a `Kids.razor`, aplicar el filtro local por nombre y renderizar un mensaje de estado vacío sin tarjetas cuando no haya coincidencias; verificar ambos resultados desde el navegador.
+2. Crear `Components/Shared/KidCard.razor` para encapsular avatar, nombre, edad, resumen de padres, etiqueta y enlace de cada niño, y crear `Components/Pages/Kids.razor` con la ruta `/kids` que renderice ocho `KidCard`; verificar que `/kids` muestra los ocho niños.
+3. Añadir el estado interactivo del buscador a `Kids.razor`, aplicar el filtro local por nombre y renderizar un `KidCard` por cada coincidencia, o un mensaje de estado vacío cuando no haya ninguna; verificar ambos resultados desde el navegador.
 4. Crear `Components/Pages/KidProfile.razor` con la ruta `/kids/{Slug}`, la consulta a `KidCatalog`, el contenido completo de perfil y el retorno a `/kids`; verificar el detalle de Mateo y de otro niño conocido.
 5. Conectar un slug no encontrado con la página `NotFound` existente; verificar que `/kids/no-existe` no muestra un perfil inventado.
 6. Actualizar `Components/Shared/Sidebar.razor` para convertir Feed y Niños en enlaces y aplicar el estilo activo según la ruta actual; verificar la navegación desde escritorio y el panel móvil.
@@ -82,6 +83,7 @@ El catálogo declara exactamente ocho niños: Mateo Fernández, Sofía Méndez, 
 
 - [ ] `dotnet build` termina sin errores.
 - [ ] La ruta `/kids` renderiza el título Niños, el buscador, el botón Agregar niño visual y las ocho tarjetas del mockup.
+- [ ] `KidCard.razor` recibe un `Kid` y encapsula el avatar, metadatos, etiqueta y enlace de cada tarjeta sin duplicar ese marcado en `Kids.razor`.
 - [ ] Cada tarjeta de `/kids` navega a `/kids/[slug]` del niño correspondiente.
 - [ ] Escribir una parte del nombre en el buscador filtra las tarjetas sin recargar la página.
 - [ ] Una búsqueda sin coincidencias muestra `No se encontraron niños` y no muestra tarjetas.
@@ -99,6 +101,7 @@ El catálogo declara exactamente ocho niños: Mateo Fernández, Sofía Méndez, 
 ## Decisions
 
 - **Sí:** catálogo C# estático compartido en `Components/Shared/KidCatalog.cs`. Evita duplicar los datos entre listado y detalle sin introducir una capa de persistencia.
+- **Sí:** `KidCard` reutilizable en `Components/Shared/`. Mantiene `Kids.razor` enfocada en la búsqueda y la composición del listado.
 - **No:** datos declarados por separado en cada página Razor. Duplicarían información y permitirían que el listado y los perfiles difirieran.
 - **Sí:** un perfil completo para cada uno de los ocho niños. La ruta dinámica representa un recurso concreto y no solo el detalle de Mateo.
 - **Sí:** datos demo coherentes para la información no incluida en los mockups de los otros siete niños. Permiten completar la interfaz estática acordada.
