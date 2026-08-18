@@ -1,0 +1,73 @@
+@page "/kids"
+@using OpenDaycare.Components.Shared
+
+<PageTitle>Niños | OpenDayCare</PageTitle>
+
+<div class="mx-auto w-full max-w-[880px] px-5 py-8 md:px-10 md:pb-20 md:pt-[34px]">
+    <header class="mb-[22px] flex items-end justify-between gap-4">
+        <div>
+            <p class="mb-1 text-[12.5px] font-extrabold tracking-[0.8px] text-[#D9583C]">GESTIÓN</p>
+            <h1 class="font-fredoka text-[30px] font-semibold text-[#3F362E]">Niños</h1>
+        </div>
+        <button type="button" class="flex items-center gap-2 rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]">
+            <svg class="size-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+            </svg>
+            Agregar niño
+        </button>
+    </header>
+
+    <div class="mb-[22px] flex items-center gap-[11px] rounded-[14px] border border-[#ECE0D0] bg-[#FFFDF9] px-4 py-3">
+        <svg class="size-[18px] shrink-0 text-[#B0A290]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m21 21-4.3-4.3" />
+        </svg>
+        <input class="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B]" placeholder="Buscar niño…" aria-label="Buscar niño" />
+    </div>
+
+    <div class="mb-3.5 flex items-center gap-3">
+        <span class="text-[12.5px] font-extrabold tracking-[0.8px] text-[#3F362E]">SALA SOLES</span>
+        <span class="text-[13px] text-[#A89A8B]">@KidCatalog.All.Count niños</span>
+        <span class="h-px flex-1 bg-[#E7DAC8]"></span>
+    </div>
+
+    <section class="grid gap-3.5 sm:grid-cols-2" aria-label="Niños de Sala Soles">
+        @foreach (var kid in KidCatalog.All)
+        {
+            <a href="/kids/@kid.Slug" class="flex min-w-0 items-center gap-3.5 rounded-[18px] border border-[#ECE0D0] bg-[#FFFDF9] p-4 shadow-[0_4px_14px_-12px_rgba(120,90,60,0.5)] transition duration-150 hover:-translate-y-0.5 hover:border-[#F2A78E]">
+                <Avatar Initials="@kid.Initials" BackgroundClass="@kid.AvatarBackgroundClass" TextClass="@kid.AvatarTextClass" SizeClass="size-12 text-[19px]" />
+                <div class="min-w-0 flex-1">
+                    <p class="truncate font-fredoka text-base font-semibold text-[#3F362E]">@kid.FullName</p>
+                    <p class="text-[13px] text-[#A89A8B]">@kid.Age años · @ParentSummary(kid.Parents.Count)</p>
+                </div>
+                @if (CardLabel(kid) is { } label)
+                {
+                    <span class="shrink-0 rounded-full px-[9px] py-[5px] text-[11px] font-extrabold @label.Class">@label.Text</span>
+                }
+                else
+                {
+                    <svg class="size-[18px] shrink-0 text-[#CBB89F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
+                }
+            </a>
+        }
+    </section>
+</div>
+
+@code {
+    private static string ParentSummary(int count) => count switch
+    {
+        0 => "sin padres vinculados",
+        1 => "1 padre vinculado",
+        _ => $"{count} padres vinculados"
+    };
+
+    private static (string Text, string Class)? CardLabel(Kid kid) => kid.Slug switch
+    {
+        "mateo-fernandez" => ("MANÍ", "bg-[#FBD8CC] text-[#D9684A]"),
+        "valentina-soto" => ("VINCULAR", "bg-[#F9D2DE] text-[#C56486]"),
+        "tomas-diaz" => ("LACTOSA", "bg-[#FBD8CC] text-[#D9684A]"),
+        _ => null
+    };
+}
