@@ -81,22 +81,22 @@ El catálogo declara exactamente ocho niños: Mateo Fernández, Sofía Méndez, 
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] La ruta `/kids` renderiza el título Niños, el buscador, el botón Agregar niño visual y las ocho tarjetas del mockup.
-- [ ] `KidCard.razor` recibe un `Kid` y encapsula el avatar, metadatos, etiqueta y enlace de cada tarjeta sin duplicar ese marcado en `Kids.razor`.
-- [ ] Cada tarjeta de `/kids` navega a `/kids/[slug]` del niño correspondiente.
-- [ ] Escribir una parte del nombre en el buscador filtra las tarjetas sin recargar la página.
-- [ ] Una búsqueda sin coincidencias muestra `No se encontraron niños` y no muestra tarjetas.
-- [ ] `/kids/mateo-fernandez` muestra el perfil de Mateo con sus datos del mockup, alerta de maní, notas y dos padres vinculados.
-- [ ] Cada uno de los otros siete slugs conocidos muestra nombre, edad, sala, fechas, tarjeta de notas y padres vinculados propios.
-- [ ] Los niños sin notas muestran `Sin alergias ni notas registradas` dentro de la tarjeta de alertas.
-- [ ] El enlace Volver a Niños de un perfil navega a `/kids`.
-- [ ] `/kids/no-existe` muestra la página NotFound y no muestra datos de ningún niño.
-- [ ] El sidebar enlaza Feed a `/` y Niños a `/kids`, y marca Feed como activo en `/` y Niños como activo en `/kids` y `/kids/[slug]`.
-- [ ] Agregar niño, Editar, Resumen del día y Vincular otro padre son elementos visuales sin navegación ni cambios de datos.
-- [ ] A 1440px, las páginas mantienen sidebar fijo, contenido centrado y la composición de los mockups.
-- [ ] A 390px, la lista, los detalles y el menú lateral siguen siendo legibles y navegables.
-- [ ] No se realizan solicitudes de API, autenticación ni persistencia al cargar, buscar o navegar entre perfiles.
+- [x] `dotnet build` termina sin errores.
+- [x] La ruta `/kids` renderiza el título Niños, el buscador, el botón Agregar niño visual y las ocho tarjetas del mockup.
+- [x] `KidCard.razor` recibe un `Kid` y encapsula el avatar, metadatos, etiqueta y enlace de cada tarjeta sin duplicar ese marcado en `Kids.razor`.
+- [x] Cada tarjeta de `/kids` navega a `/kids/[slug]` del niño correspondiente.
+- [x] Escribir una parte del nombre en el buscador filtra las tarjetas sin recargar la página.
+- [x] Una búsqueda sin coincidencias muestra `No se encontraron niños` y no muestra tarjetas.
+- [x] `/kids/mateo-fernandez` muestra el perfil de Mateo con sus datos del mockup, alerta de maní, notas y dos padres vinculados.
+- [x] Cada uno de los otros siete slugs conocidos muestra nombre, edad, sala, fechas, tarjeta de notas y padres vinculados propios.
+- [x] Los niños sin notas muestran `Sin alergias ni notas registradas` dentro de la tarjeta de alertas.
+- [x] El enlace Volver a Niños de un perfil navega a `/kids`.
+- [x] `/kids/no-existe` muestra la página NotFound y no muestra datos de ningún niño.
+- [x] El sidebar enlaza Feed a `/` y Niños a `/kids`, y marca Feed como activo en `/` y Niños como activo en `/kids` y `/kids/[slug]`.
+- [x] Agregar niño, Editar, Resumen del día y Vincular otro padre son elementos visuales sin navegación ni cambios de datos.
+- [x] A 1440px, las páginas mantienen sidebar fijo, contenido centrado y la composición de los mockups.
+- [x] A 390px, la lista, los detalles y el menú lateral siguen siendo legibles y navegables.
+- [x] No se realizan solicitudes de API, autenticación ni persistencia al cargar, buscar o navegar entre perfiles.
 
 ## Decisions
 
