@@ -1,4 +1,5 @@
 @page "/kids/{Slug}"
+@inject NavigationManager Navigation
 @using System.Globalization
 @using OpenDaycare.Components.Shared
 
@@ -104,4 +105,12 @@
     public string? Slug { get; set; }
 
     private Kid? CurrentKid => KidCatalog.FindBySlug(Slug);
+
+    protected override void OnParametersSet()
+    {
+        if (CurrentKid is null)
+        {
+            Navigation.NavigateTo("/not-found", replace: true);
+        }
+    }
 }
