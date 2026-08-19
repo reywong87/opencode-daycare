@@ -1,0 +1,52 @@
+@page "/activate-account"
+@layout AuthLayout
+
+<PageTitle>Activar cuenta | OpenDayCare</PageTitle>
+
+<div class="flex min-h-screen items-center justify-center bg-[#FBF4EC] px-10 py-10">
+    <div class="w-full max-w-[440px]">
+        <div class="mb-[22px] flex size-[58px] items-center justify-center rounded-[18px] bg-linear-to-br from-[#F8C3A8] to-[#F2937A] text-white shadow-[0_12px_26px_-10px_rgba(238,129,100,0.65)]">
+            <svg class="size-[30px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+            </svg>
+        </div>
+
+        <h1 class="font-fredoka text-[32px] leading-[1.15] font-semibold text-[#3F362E] focus:outline-none">Bienvenida a OpenDayCare</h1>
+        <p class="mt-2 max-w-[420px] text-[15.5px] leading-[1.55] text-[#94887B]">Te han invitado a seguir el día de tu hijo. Crea tu contraseña para activar la cuenta.</p>
+
+        <section class="mt-[26px] flex items-center gap-3.5 rounded-[16px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5" aria-label="Invitación">
+            <div class="flex size-11 shrink-0 items-center justify-center rounded-full bg-[#A9D9E8] font-fredoka text-[19px] font-semibold text-[#1F7A93]">M</div>
+            <div>
+                <p class="text-[13px] text-[#94887B]">Te han invitado a seguir a</p>
+                <p class="font-fredoka text-[17px] font-semibold text-[#3F362E]">Mateo · Sala Soles</p>
+            </div>
+        </section>
+
+        <form class="mt-[22px]" novalidate>
+            <div>
+                <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="invitation-code">CÓDIGO DE INVITACIÓN</label>
+                <input id="invitation-code" name="invitation-code" type="text" autocomplete="off" placeholder="ABCDE" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 font-fredoka text-lg font-bold tracking-[3px] text-[#3F362E] outline-none placeholder:font-nunito placeholder:text-[15px] placeholder:font-normal placeholder:tracking-normal placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+            </div>
+
+            <div class="mt-[18px]">
+                <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="activation-email">EMAIL</label>
+                <input id="activation-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+            </div>
+
+            <div class="mt-[18px]">
+                <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="activation-password">CREAR CONTRASEÑA</label>
+                <input id="activation-password" name="password" type="password" autocomplete="new-password" placeholder="••••••••" class="w-full rounded-[14px] border-[1.5px] border-[#F2A78E] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+            </div>
+
+            <label class="mt-6 flex cursor-pointer items-start gap-3 rounded-[14px] bg-[#FBF1D6] px-4 py-3.5">
+                <input type="checkbox" checked class="mt-px size-6 shrink-0 cursor-pointer accent-[#5FB97E]" />
+                <span class="text-sm leading-[1.45] text-[#8A7234]">Autorizo a la guardería a tomar y compartir fotos de mi hijo dentro de la app.</span>
+            </label>
+
+            <button type="button" class="mt-6 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">Activar mi cuenta</button>
+        </form>
+
+        <p class="mt-[22px] text-center text-[14.5px] text-[#94887B]">¿Ya tienes cuenta? <a class="font-extrabold text-[#C5503A]" href="/login">Iniciar sesión</a></p>
+    </div>
+</div>
