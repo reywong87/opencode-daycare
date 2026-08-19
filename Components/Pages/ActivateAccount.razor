@@ -1,5 +1,8 @@
 @page "/activate-account"
 @layout AuthLayout
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
 
 <PageTitle>Activar cuenta | OpenDayCare</PageTitle>
 
@@ -23,30 +26,69 @@
             </div>
         </section>
 
-        <form class="mt-[22px]" novalidate>
+        <EditForm Model="activation" OnValidSubmit="HandleValidSubmit" class="mt-[22px]" novalidate>
+            <DataAnnotationsValidator />
             <div>
                 <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="invitation-code">CÓDIGO DE INVITACIÓN</label>
-                <input id="invitation-code" name="invitation-code" type="text" autocomplete="off" placeholder="ABCDE" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 font-fredoka text-lg font-bold tracking-[3px] text-[#3F362E] outline-none placeholder:font-nunito placeholder:text-[15px] placeholder:font-normal placeholder:tracking-normal placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                <input id="invitation-code" name="invitation-code" type="text" autocomplete="off" placeholder="ABCDE" @bind="activation.InvitationCode" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 font-fredoka text-lg font-bold tracking-[3px] text-[#3F362E] outline-none placeholder:font-nunito placeholder:text-[15px] placeholder:font-normal placeholder:tracking-normal placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                <ValidationMessage For="() => activation.InvitationCode" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
             </div>
 
             <div class="mt-[18px]">
                 <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="activation-email">EMAIL</label>
-                <input id="activation-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                <input id="activation-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" @bind="activation.Email" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                <ValidationMessage For="() => activation.Email" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
             </div>
 
             <div class="mt-[18px]">
                 <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="activation-password">CREAR CONTRASEÑA</label>
-                <input id="activation-password" name="password" type="password" autocomplete="new-password" placeholder="••••••••" class="w-full rounded-[14px] border-[1.5px] border-[#F2A78E] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                <input id="activation-password" name="password" type="password" autocomplete="new-password" placeholder="••••••••" @bind="activation.Password" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#F2A78E] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                <ValidationMessage For="() => activation.Password" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
             </div>
 
             <label class="mt-6 flex cursor-pointer items-start gap-3 rounded-[14px] bg-[#FBF1D6] px-4 py-3.5">
-                <input type="checkbox" checked class="mt-px size-6 shrink-0 cursor-pointer accent-[#5FB97E]" />
+                <input type="checkbox" @bind="activation.HasPhotoConsent" class="mt-px size-6 shrink-0 cursor-pointer accent-[#5FB97E]" />
                 <span class="text-sm leading-[1.45] text-[#8A7234]">Autorizo a la guardería a tomar y compartir fotos de mi hijo dentro de la app.</span>
             </label>
+            <ValidationMessage For="() => activation.HasPhotoConsent" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
 
-            <button type="button" class="mt-6 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">Activar mi cuenta</button>
-        </form>
+            <button type="submit" class="mt-6 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">Activar mi cuenta</button>
+        </EditForm>
 
         <p class="mt-[22px] text-center text-[14.5px] text-[#94887B]">¿Ya tienes cuenta? <a class="font-extrabold text-[#C5503A]" href="/login">Iniciar sesión</a></p>
     </div>
 </div>
+
+@code {
+    private readonly ActivationForm activation = new();
+
+    private void HandleValidSubmit()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private sealed class ActivationForm : IValidatableObject
+    {
+        [Required(ErrorMessage = "Introduce el código de invitación.")]
+        public string InvitationCode { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Introduce tu email.")]
+        [EmailAddress(ErrorMessage = "Introduce un email válido.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Introduce una contraseña.")]
+        public string Password { get; set; } = string.Empty;
+
+        public bool HasPhotoConsent { get; set; } = true;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!HasPhotoConsent)
+            {
+                yield return new ValidationResult(
+                    "Debes autorizar el uso de fotografías para activar la cuenta.",
+                    [nameof(HasPhotoConsent)]);
+            }
+        }
+    }
+}
