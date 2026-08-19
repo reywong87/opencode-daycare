@@ -1,5 +1,8 @@
 @page "/login"
 @layout AuthLayout
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
 
 <PageTitle>Iniciar sesión | OpenDayCare</PageTitle>
 
@@ -31,25 +34,47 @@
             <h1 class="font-fredoka text-[30px] font-semibold text-[#3F362E] focus:outline-none">Iniciar sesión</h1>
             <p class="mt-1.5 text-[15px] text-[#94887B]">Ingresá para ver el día de hoy.</p>
 
-            <form class="mt-7" novalidate>
+            <EditForm Model="login" OnValidSubmit="HandleValidSubmit" class="mt-7" novalidate>
+                <DataAnnotationsValidator />
                 <div>
                     <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-email">EMAIL</label>
-                    <input id="login-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <input id="login-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" @bind="login.Email" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <ValidationMessage For="() => login.Email" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
                 </div>
 
                 <div class="mt-[18px]">
                     <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-password">CONTRASEÑA</label>
-                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" @bind="login.Password" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <ValidationMessage For="() => login.Password" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
                 </div>
 
                 <div class="mt-2.5 text-right">
                     <button type="button" class="cursor-pointer text-[13.5px] font-bold text-[#C5503A]">¿Olvidaste tu contraseña?</button>
                 </div>
 
-                <button type="button" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">Iniciar sesión</button>
-            </form>
+                <button type="submit" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">Iniciar sesión</button>
+            </EditForm>
 
             <p class="mt-6 text-center text-[14.5px] text-[#94887B]">¿Te invitó la guardería? <a class="font-extrabold text-[#C5503A]" href="/activate-account">Activá tu cuenta</a></p>
         </div>
     </section>
 </div>
+
+@code {
+    private readonly LoginForm login = new();
+
+    private void HandleValidSubmit()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private sealed class LoginForm
+    {
+        [Required(ErrorMessage = "Ingresa tu email.")]
+        [EmailAddress(ErrorMessage = "Ingresa un email válido.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Ingresa tu contraseña.")]
+        public string Password { get; set; } = string.Empty;
+    }
+}
