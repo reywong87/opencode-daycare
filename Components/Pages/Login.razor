@@ -1,0 +1,85 @@
+@page "/login"
+@layout AuthLayout
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<PageTitle>Iniciar sesión | OpenDayCare</PageTitle>
+
+<div class="min-h-screen bg-[#FBF4EC] lg:grid lg:grid-cols-[1.05fr_1fr]">
+    <section class="relative hidden overflow-hidden bg-[linear-gradient(155deg,#F6A98E_0%,#F2937A_45%,#EC7E62_100%)] px-[60px] py-14 text-white lg:flex lg:flex-col lg:justify-between">
+        <div class="absolute -right-[120px] -top-[140px] size-[420px] rounded-full bg-white/12"></div>
+        <div class="absolute -bottom-[110px] -left-20 size-[300px] rounded-full bg-white/10"></div>
+
+        <div class="relative flex items-center gap-[13px]">
+            <div class="flex size-[46px] items-center justify-center rounded-[14px] bg-white/22">
+                <svg class="size-[26px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+                </svg>
+            </div>
+            <span class="font-fredoka text-[21px] font-semibold tracking-[0.5px]">OpenDayCare</span>
+        </div>
+
+        <div class="relative">
+            <h1 class="font-fredoka text-[42px] leading-[1.12] font-semibold focus:outline-none">El día de cada niño,<br />compartido con su familia.</h1>
+            <p class="mt-[18px] max-w-[430px] text-[17px] leading-[1.6] text-white/92">Publica momentos, gestiona las salas y mantén a las familias cerca, desde un solo lugar.</p>
+        </div>
+
+        <p class="relative text-sm text-white/90">🌿 Guardería Sala Soles</p>
+    </section>
+
+    <section class="flex min-h-screen items-center justify-center px-10 py-10">
+        <div class="w-full max-w-[392px]">
+            <h1 class="font-fredoka text-[30px] font-semibold text-[#3F362E] focus:outline-none">Iniciar sesión</h1>
+            <p class="mt-1.5 text-[15px] text-[#94887B]">Inicia sesión para ver el día de hoy.</p>
+
+            <EditForm Model="login" OnValidSubmit="HandleValidSubmit" class="mt-7" novalidate>
+                <DataAnnotationsValidator />
+                <div>
+                    <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-email">EMAIL</label>
+                    <input id="login-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" @bind="login.Email" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <ValidationMessage For="() => login.Email" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
+                </div>
+
+                <div class="mt-[18px]">
+                    <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-password">CONTRASEÑA</label>
+                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" @bind="login.Password" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <ValidationMessage For="() => login.Password" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
+                </div>
+
+                <div class="mt-2.5 text-right">
+                    <button type="button" class="cursor-pointer text-[13.5px] font-bold text-[#C5503A]">¿Olvidaste tu contraseña?</button>
+                </div>
+
+                <button type="submit" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">Iniciar sesión</button>
+            </EditForm>
+
+            <p class="mt-6 text-center text-[14.5px] text-[#94887B]">¿Te ha invitado la guardería? <a class="font-extrabold text-[#C5503A]" href="/activate-account" @onclick="NavigateToActivation" @onclick:preventDefault="true">Activa tu cuenta</a></p>
+        </div>
+    </section>
+</div>
+
+@code {
+    private readonly LoginForm login = new();
+
+    private void HandleValidSubmit()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private void NavigateToActivation()
+    {
+        Navigation.NavigateTo("/activate-account");
+    }
+
+    private sealed class LoginForm
+    {
+        [Required(ErrorMessage = "Ingresa tu email.")]
+        [EmailAddress(ErrorMessage = "Ingresa un email válido.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Ingresa tu contraseña.")]
+        public string Password { get; set; } = string.Empty;
+    }
+}
