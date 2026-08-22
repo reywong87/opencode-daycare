@@ -50,24 +50,24 @@ La tarjeta de invitación de activación declara contenido demo estático: `Mate
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] `/login` muestra la pantalla de inicio de sesión sin sidebar.
-- [ ] `/activate-account` muestra la pantalla de activación sin sidebar.
-- [ ] El login no muestra opciones de ingreso `Personal` ni `Familia`.
-- [ ] A 1440px, `/login` muestra el panel coral de marca y el formulario según el mockup.
-- [ ] A 390px, `/login` oculta el panel coral y mantiene el formulario legible y usable.
-- [ ] Los campos de login comienzan vacíos y muestran placeholders.
-- [ ] En login, email vacío, email inválido o contraseña vacía muestran un error local y no navegan.
-- [ ] En login, un email válido y una contraseña no vacía navegan a `/`.
-- [ ] El enlace `Activá tu cuenta` navega a `/activate-account` aunque el login tenga campos inválidos.
-- [ ] El enlace `¿Olvidaste tu contraseña?` no navega ni abre un flujo.
-- [ ] La activación muestra la tarjeta estática `Mateo · Sala Soles`.
-- [ ] Código, email y contraseña de activación comienzan vacíos.
-- [ ] En activación, código vacío, email vacío o inválido, contraseña vacía o consentimiento desmarcado muestran errores locales y no navegan.
-- [ ] El consentimiento de fotos inicia marcado y es obligatorio para activar.
-- [ ] En activación, los valores válidos y el consentimiento marcado navegan a `/`.
-- [ ] El enlace `Iniciar sesión` navega a `/login` aunque activación tenga campos inválidos.
-- [ ] No se realizan solicitudes de autenticación, API ni persistencia al cargar, validar o enviar los formularios.
+- [x] `dotnet build` termina sin errores.
+- [x] `/login` muestra la pantalla de inicio de sesión sin sidebar.
+- [x] `/activate-account` muestra la pantalla de activación sin sidebar.
+- [x] El login no muestra opciones de ingreso `Personal` ni `Familia`.
+- [x] A 1440px, `/login` muestra el panel coral de marca y el formulario según el mockup.
+- [x] A 390px, `/login` oculta el panel coral y mantiene el formulario legible y usable.
+- [x] Los campos de login comienzan vacíos y muestran placeholders.
+- [x] En login, email vacío, email inválido o contraseña vacía muestran un error local y no navegan.
+- [x] En login, un email válido y una contraseña no vacía navegan a `/`.
+- [x] El enlace `Activá tu cuenta` navega a `/activate-account` aunque el login tenga campos inválidos.
+- [x] El enlace `¿Olvidaste tu contraseña?` no navega ni abre un flujo.
+- [x] La activación muestra la tarjeta estática `Mateo · Sala Soles`.
+- [x] Código, email y contraseña de activación comienzan vacíos.
+- [x] En activación, código vacío, email vacío o inválido, contraseña vacía o consentimiento desmarcado muestran errores locales y no navegan.
+- [x] El consentimiento de fotos inicia marcado y es obligatorio para activar.
+- [x] En activación, los valores válidos y el consentimiento marcado navegan a `/`.
+- [x] El enlace `Iniciar sesión` navega a `/login` aunque activación tenga campos inválidos.
+- [x] No se realizan solicitudes de autenticación, API ni persistencia al cargar, validar o enviar los formularios.
 
 ## Decisions
 
