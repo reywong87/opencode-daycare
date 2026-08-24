@@ -1,0 +1,51 @@
+@if (IsOpen)
+{
+    <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
+        <section class="w-full max-w-[520px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="add-kid-title">
+            <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
+                <button type="button" class="cursor-pointer text-[15px] font-bold text-[#94887B]">Cancelar</button>
+                <h2 id="add-kid-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Agregar niño</h2>
+                <button type="button" class="cursor-pointer text-[15px] font-extrabold text-[#D9583C]">Guardar</button>
+            </header>
+
+            <form class="space-y-[18px] px-[26px] py-6" novalidate>
+                <div>
+                    <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-full-name">NOMBRE COMPLETO</label>
+                    <input id="kid-full-name" type="text" autocomplete="name" placeholder="Ej. Martina López" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                </div>
+
+                <div class="grid gap-[18px] sm:grid-cols-2 sm:gap-[14px]">
+                    <div>
+                        <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-birth-date">FECHA DE NACIMIENTO</label>
+                        <input id="kid-birth-date" type="date" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none focus:border-[#F2937A]" />
+                    </div>
+
+                    <div class="relative">
+                        <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-room">SALA</label>
+                        <select id="kid-room" class="w-full cursor-pointer appearance-none rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] pr-10 text-[15px] font-bold text-[#3F362E] outline-none focus:border-[#F2937A]">
+                            <option>Soles</option>
+                        </select>
+                        <svg class="pointer-events-none absolute bottom-[15px] right-4 size-4 text-[#B0A290]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-allergies">ALERGIAS</label>
+                    <input id="kid-allergies" type="text" placeholder="Ej. Cacahuetes, lactosa" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-medical-notes">NOTAS MÉDICAS</label>
+                    <textarea id="kid-medical-notes" placeholder="Indicaciones, medicación, contactos..." class="min-h-[90px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] leading-6 text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
+                </div>
+            </form>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+}
