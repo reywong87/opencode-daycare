@@ -11,19 +11,21 @@
             <form class="space-y-[18px] px-[26px] py-6" novalidate>
                 <div>
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-full-name">NOMBRE COMPLETO</label>
-                    <input id="kid-full-name" type="text" autocomplete="name" placeholder="Ej. Martina López" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <input id="kid-full-name" type="text" autocomplete="name" placeholder="Ej. Martina López" @bind="draft.FullName" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
                 </div>
 
                 <div class="grid gap-[18px] sm:grid-cols-2 sm:gap-[14px]">
                     <div>
                         <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-birth-date">FECHA DE NACIMIENTO</label>
-                        <input id="kid-birth-date" type="date" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none focus:border-[#F2937A]" />
+                        <input id="kid-birth-date" type="date" @bind="draft.BirthDate" @bind:format="yyyy-MM-dd" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none focus:border-[#F2937A]" />
                     </div>
 
                     <div class="relative">
                         <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-room">SALA</label>
-                        <select id="kid-room" class="w-full cursor-pointer appearance-none rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] pr-10 text-[15px] font-bold text-[#3F362E] outline-none focus:border-[#F2937A]">
+                        <select id="kid-room" @bind="draft.Room" class="w-full cursor-pointer appearance-none rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] pr-10 text-[15px] font-bold text-[#3F362E] outline-none focus:border-[#F2937A]">
                             <option>Soles</option>
+                            <option>Estrellas</option>
+                            <option>Arcoíris</option>
                         </select>
                         <svg class="pointer-events-none absolute bottom-[15px] right-4 size-4 text-[#B0A290]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="m6 9 6 6 6-6" />
@@ -33,12 +35,12 @@
 
                 <div>
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-allergies">ALERGIAS</label>
-                    <input id="kid-allergies" type="text" placeholder="Ej. Cacahuetes, lactosa" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <input id="kid-allergies" type="text" placeholder="Ej. Cacahuetes, lactosa" @bind="draft.Allergies" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
                 </div>
 
                 <div>
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-medical-notes">NOTAS MÉDICAS</label>
-                    <textarea id="kid-medical-notes" placeholder="Indicaciones, medicación, contactos..." class="min-h-[90px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] leading-6 text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
+                    <textarea id="kid-medical-notes" placeholder="Indicaciones, medicación, contactos..." @bind="draft.MedicalNotes" @bind:event="oninput" class="min-h-[90px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] leading-6 text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
                 </div>
             </form>
         </section>
@@ -51,4 +53,15 @@
 
     [Parameter]
     public EventCallback OnCancel { get; set; }
+
+    private readonly AddKidDraft draft = new();
+
+    private sealed class AddKidDraft
+    {
+        public string FullName { get; set; } = string.Empty;
+        public DateOnly? BirthDate { get; set; }
+        public string Room { get; set; } = "Soles";
+        public string Allergies { get; set; } = string.Empty;
+        public string MedicalNotes { get; set; } = string.Empty;
+    }
 }
