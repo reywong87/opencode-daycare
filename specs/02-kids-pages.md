@@ -1,6 +1,6 @@
 # SPEC 02 — Páginas de niños
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-08-18
 > **Objective:** Añadir un listado y perfiles estáticos de niños en las rutas `/kids` y `/kids/[slug]` que reproduzcan los mockups proporcionados.

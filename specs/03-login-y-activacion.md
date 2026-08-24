@@ -1,6 +1,6 @@
 # SPEC 03 — Login y activación de cuenta
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-08-18
 > **Objective:** Añadir las pantallas estáticas e interactivas de login y activación de cuenta en `/login` y `/activate-account` sin sidebar ni autenticación real.
