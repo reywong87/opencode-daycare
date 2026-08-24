@@ -3,7 +3,7 @@
     <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
         <section class="w-full max-w-[520px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="add-kid-title">
             <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
-                <button type="button" class="cursor-pointer text-[15px] font-bold text-[#94887B]">Cancelar</button>
+                <button type="button" class="cursor-pointer text-[15px] font-bold text-[#94887B]" @onclick="OnCancel">Cancelar</button>
                 <h2 id="add-kid-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Agregar niño</h2>
                 <button type="button" class="cursor-pointer text-[15px] font-extrabold text-[#D9583C]">Guardar</button>
             </header>
@@ -48,4 +48,7 @@
 @code {
     [Parameter]
     public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
 }
