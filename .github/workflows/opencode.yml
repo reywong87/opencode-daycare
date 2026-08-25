@@ -38,5 +38,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: opencode/glm-5
+          model: opencode/minimax-m2.5-free
           use_github_token: true
