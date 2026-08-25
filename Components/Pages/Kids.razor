@@ -10,7 +10,7 @@
             <p class="mb-1 text-[12.5px] font-extrabold tracking-[0.8px] text-[#D9583C]">GESTIÓN</p>
             <h1 class="font-fredoka text-[30px] font-semibold text-[#3F362E]">Niños</h1>
         </div>
-        <button type="button" class="flex items-center gap-2 rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]">
+        <button type="button" class="flex cursor-pointer items-center gap-2 rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]" @onclick="OpenAddKidModal">
             <svg class="size-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 5v14M5 12h14" />
             </svg>
@@ -47,8 +47,21 @@
     }
 </div>
 
+<AddKidModal IsOpen="isAddKidModalOpen" OnCancel="CloseAddKidModal" OnSave="CloseAddKidModal" />
+
 @code {
     private string searchTerm = string.Empty;
+    private bool isAddKidModalOpen;
+
+    private void OpenAddKidModal()
+    {
+        isAddKidModalOpen = true;
+    }
+
+    private void CloseAddKidModal()
+    {
+        isAddKidModalOpen = false;
+    }
 
     private IReadOnlyList<Kid> FilteredKids => string.IsNullOrWhiteSpace(searchTerm)
         ? KidCatalog.All
