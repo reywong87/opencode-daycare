@@ -8,5 +8,22 @@
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
     "tailwindcss": "^4.3.3"
+  },
+  "version": "1.0.0",
+  "description": "Interfaz web para la gestión y comunicación diaria de una guardería. La pantalla principal presenta el muro de publicaciones de la Sala Soles, con actividades, logros y anuncios para las familias.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reywong87/opencode-daycare.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/reywong87/opencode-daycare/issues"
+  },
+  "homepage": "https://github.com/reywong87/opencode-daycare#readme",
+  "dependencies": {
+    "@playwright/test": "^1.62.1"
   }
 }

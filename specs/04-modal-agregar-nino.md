@@ -60,21 +60,21 @@ El borrador solo existe mientras el modal está abierto y se restablece al cerra
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] Pulsar `Agregar niño` en `/kids` abre el modal sin navegar.
-- [ ] El modal muestra nombre completo, fecha de nacimiento, sala, alergias y notas médicas.
-- [ ] El selector Sala ofrece Soles, Estrellas y Arcoíris.
-- [ ] Nombre, fecha y sala son obligatorios.
-- [ ] Una fecha vacía, inválida o futura muestra un error local y mantiene el modal abierto.
-- [ ] Alergias y notas médicas son opcionales.
-- [ ] Guardar con datos válidos cierra el modal.
-- [ ] Guardar no añade tarjetas, no modifica el contador de niños y no cambia `KidCatalog`.
-- [ ] Cancelar, pulsar el fondo y Escape cierran el modal.
-- [ ] Pulsar dentro del panel no cierra el modal.
-- [ ] Al reabrir, los campos y errores están restablecidos.
-- [ ] A 1440px, el modal reproduce la composición del mockup sobre `/kids`.
-- [ ] A 390px, el modal permanece legible, navegable y sin desbordamiento horizontal.
-- [ ] No se realizan solicitudes de API ni se persisten datos.
+- [x] `dotnet build` termina sin errores.
+- [x] Pulsar `Agregar niño` en `/kids` abre el modal sin navegar.
+- [x] El modal muestra nombre completo, fecha de nacimiento, sala, alergias y notas médicas.
+- [x] El selector Sala ofrece Soles, Estrellas y Arcoíris.
+- [x] Nombre, fecha y sala son obligatorios.
+- [x] Una fecha vacía, inválida o futura muestra un error local y mantiene el modal abierto.
+- [x] Alergias y notas médicas son opcionales.
+- [x] Guardar con datos válidos cierra el modal.
+- [x] Guardar no añade tarjetas, no modifica el contador de niños y no cambia `KidCatalog`.
+- [x] Cancelar, pulsar el fondo y Escape cierran el modal.
+- [x] Pulsar dentro del panel no cierra el modal.
+- [x] Al reabrir, los campos y errores están restablecidos.
+- [x] A 1440px, el modal reproduce la composición del mockup sobre `/kids`.
+- [x] A 390px, el modal permanece legible, navegable y sin desbordamiento horizontal.
+- [x] No se realizan solicitudes de API ni se persisten datos.
 
 ## Decisions
 
