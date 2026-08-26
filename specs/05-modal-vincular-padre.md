@@ -1,6 +1,6 @@
 # SPEC 05 — Modal para vincular padre
 
-> **Status:** Draft
+> **Status:** Approved
 > **Depends on:** SPEC 02, SPEC 04
 > **Date:** 2026-08-26
 > **Objective:** Añadir un modal temporal para validar visualmente la invitación de un padre desde el perfil de un niño sin enviar correo ni modificar sus padres vinculados.
