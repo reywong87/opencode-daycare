@@ -1,6 +1,6 @@
 # SPEC 05 — Modal para vincular padre
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 02, SPEC 04
 > **Date:** 2026-08-26
 > **Objective:** Añadir un modal temporal para validar visualmente la invitación de un padre desde el perfil de un niño sin enviar correo ni modificar sus padres vinculados.
@@ -58,23 +58,23 @@ El borrador solo existe mientras el modal está abierto, `Relationship` inicia c
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] Pulsar `Vincular otro padre` en una ruta válida `/kids/{Slug}` abre el modal sin navegar.
-- [ ] El encabezado del modal muestra `Vincular padre` y el nombre del niño de la ficha actual.
-- [ ] El modal muestra el aviso sobre el correo de activación y que el padre solo verá el feed del niño actual.
-- [ ] Nombre y email comienzan vacíos y muestran los placeholders `Ej. Diego Fernández` y `correo@ejemplo.com`.
-- [ ] El selector ofrece exactamente `Mamá`, `Papá` y `Tutor/a`, y `Mamá` inicia seleccionado.
-- [ ] El modal muestra el código fijo `7K4P9` y `Vence en 7 días`.
-- [ ] Enviar con nombre vacío, email vacío o email inválido muestra errores locales y mantiene abierto el modal.
-- [ ] Enviar con nombre no vacío y email válido cierra el modal.
-- [ ] Enviar con datos válidos no envía correo, no realiza solicitudes de API y no persiste datos.
-- [ ] Enviar con datos válidos no añade padres, invitaciones ni estados pendientes a `PADRES VINCULADOS`.
-- [ ] Pulsar X, pulsar el fondo o pulsar Escape cierra el modal.
-- [ ] Pulsar dentro del panel no cierra el modal.
-- [ ] Al reabrir el modal, nombre y email están vacíos, `Mamá` está seleccionada y no se muestran errores anteriores.
-- [ ] A 1440px, el modal reproduce la composición del mockup sobre el perfil del niño.
-- [ ] A 390px, el modal permanece legible, navegable y sin desbordamiento horizontal.
-- [ ] Al abrir el modal, recibe el foco de teclado para que Escape pueda cerrarlo.
+- [x] `dotnet build` termina sin errores.
+- [x] Pulsar `Vincular otro padre` en una ruta válida `/kids/{Slug}` abre el modal sin navegar.
+- [x] El encabezado del modal muestra `Vincular padre` y el nombre del niño de la ficha actual.
+- [x] El modal muestra el aviso sobre el correo de activación y que el padre solo verá el feed del niño actual.
+- [x] Nombre y email comienzan vacíos y muestran los placeholders `Ej. Diego Fernández` y `correo@ejemplo.com`.
+- [x] El selector ofrece exactamente `Mamá`, `Papá` y `Tutor/a`, y `Mamá` inicia seleccionado.
+- [x] El modal muestra el código fijo `7K4P9` y `Vence en 7 días`.
+- [x] Enviar con nombre vacío, email vacío o email inválido muestra errores locales y mantiene abierto el modal.
+- [x] Enviar con nombre no vacío y email válido cierra el modal.
+- [x] Enviar con datos válidos no envía correo, no realiza solicitudes de API y no persiste datos.
+- [x] Enviar con datos válidos no añade padres, invitaciones ni estados pendientes a `PADRES VINCULADOS`.
+- [x] Pulsar X, pulsar el fondo o pulsar Escape cierra el modal.
+- [x] Pulsar dentro del panel no cierra el modal.
+- [x] Al reabrir el modal, nombre y email están vacíos, `Mamá` está seleccionada y no se muestran errores anteriores.
+- [x] A 1440px, el modal reproduce la composición del mockup sobre el perfil del niño.
+- [x] A 390px, el modal permanece legible, navegable y sin desbordamiento horizontal.
+- [x] Al abrir el modal, recibe el foco de teclado para que Escape pueda cerrarlo.
 
 ## Decisions
 
