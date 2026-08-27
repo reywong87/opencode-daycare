@@ -1,4 +1,5 @@
 @page "/kids/{Slug}"
+@rendermode InteractiveServer
 @inject NavigationManager Navigation
 @using System.Globalization
 @using OpenDaycare.Components.Shared
@@ -85,7 +86,7 @@
                                 </div>
                             }
                         }
-                        <button type="button" class="flex items-center gap-3 pt-2 text-left">
+                        <button type="button" class="flex items-center gap-3 pt-2 text-left" @onclick="OpenLinkParentModal">
                             <span class="flex size-10 shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-[#B0A290]">
                                 <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M12 5v14M5 12h14" />
@@ -98,6 +99,8 @@
             </aside>
         </div>
     </div>
+
+    <LinkParentModal IsOpen="isLinkParentModalOpen" KidName="@kid.FullName" OnCancel="CloseLinkParentModal" OnSave="CloseLinkParentModal" />
 }
 
 @code {
@@ -105,6 +108,17 @@
     public string? Slug { get; set; }
 
     private Kid? CurrentKid => KidCatalog.FindBySlug(Slug);
+    private bool isLinkParentModalOpen;
+
+    private void OpenLinkParentModal()
+    {
+        isLinkParentModalOpen = true;
+    }
+
+    private void CloseLinkParentModal()
+    {
+        isLinkParentModalOpen = false;
+    }
 
     protected override void OnParametersSet()
     {

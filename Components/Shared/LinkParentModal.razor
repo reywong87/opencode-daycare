@@ -1,0 +1,142 @@
+@using System.ComponentModel.DataAnnotations
+
+@if (IsOpen)
+{
+    <div @ref="modalOverlay" @onclick="HandleBackdropClickAsync" @onkeydown="HandleKeyDownAsync" tabindex="-1" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
+        <section @onclick:stopPropagation="true" class="w-full max-w-[480px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="link-parent-title">
+            <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
+                <div>
+                    <h2 id="link-parent-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Vincular padre</h2>
+                    <p class="text-[13px] text-[#A89A8B]">a @KidName</p>
+                </div>
+                <button type="button" class="flex size-[34px] items-center justify-center rounded-[10px] bg-[#F0E6D8] text-[#94887B]" aria-label="Cerrar modal" @onclick="HandleCancelAsync">
+                    <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </header>
+
+            <EditForm Model="draft" OnValidSubmit="HandleValidSubmit" class="px-[26px] py-[22px]" novalidate>
+                <DataAnnotationsValidator />
+                <div class="mb-5 flex gap-[11px] rounded-[14px] bg-[#E3ECFB] px-4 py-[13px]">
+                    <svg class="mt-px size-5 shrink-0 text-[#4E72C8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4M12 8h.01" />
+                    </svg>
+                    <p class="text-[13.5px] leading-[1.45] text-[#3F5694]">Le enviaremos un correo con un código para que active su cuenta. Solo verá el feed de @KidName.</p>
+                </div>
+
+                <div class="mb-[18px]">
+                    <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="parent-full-name">NOMBRE DEL PADRE/MADRE</label>
+                    <input id="parent-full-name" type="text" autocomplete="name" placeholder="Ej. Diego Fernández" @bind="draft.FullName" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <ValidationMessage For="() => draft.FullName" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
+                </div>
+
+                <div class="mb-[18px]">
+                    <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="parent-email">EMAIL</label>
+                    <input id="parent-email" type="email" autocomplete="email" placeholder="correo@ejemplo.com" @bind="draft.Email" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <ValidationMessage For="() => draft.Email" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
+                </div>
+
+                <fieldset class="mb-5">
+                    <legend class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">PARENTESCO</legend>
+                    <div class="flex gap-[9px]">
+                        @foreach (var relationship in Relationships)
+                        {
+                            <button type="button" aria-pressed="@(draft.Relationship == relationship)" class="@GetRelationshipClass(relationship)" @onclick="() => draft.Relationship = relationship">@relationship</button>
+                        }
+                    </div>
+                </fieldset>
+
+                <section class="mb-5 rounded-2xl border-[1.5px] border-dashed border-[#E6D08A] bg-[#FBF1D6] px-[18px] py-[18px] text-center" aria-labelledby="invitation-code-title">
+                    <h3 id="invitation-code-title" class="mb-2 text-xs font-extrabold tracking-[0.7px] text-[#A88526]">CÓDIGO DE INVITACIÓN</h3>
+                    <p class="font-fredoka text-[34px] font-semibold tracking-[7px] text-[#8A7234]">7K4P9</p>
+                    <p class="mt-[6px] text-[13px] text-[#A88526]">Vence en 7 días</p>
+                </section>
+
+                <button type="submit" class="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">
+                    <svg class="size-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m22 2-7 20-4-9-9-4z" />
+                        <path d="M22 2 11 13" />
+                    </svg>
+                    Enviar invitación
+                </button>
+            </EditForm>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public string KidName { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
+    private static readonly string[] Relationships = ["Mamá", "Papá", "Tutor/a"];
+    private LinkParentDraft draft = new();
+    private ElementReference modalOverlay;
+    private bool shouldFocusModal;
+    private bool wasOpen;
+
+    protected override void OnParametersSet()
+    {
+        if (IsOpen && !wasOpen)
+        {
+            shouldFocusModal = true;
+        }
+
+        wasOpen = IsOpen;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (shouldFocusModal)
+        {
+            shouldFocusModal = false;
+            await modalOverlay.FocusAsync(preventScroll: true);
+        }
+    }
+
+    private string GetRelationshipClass(string relationship) => draft.Relationship == relationship
+        ? "flex-1 rounded-full border-[1.5px] border-[#9FB8EC] bg-[#CCD8F4] py-[11px] text-sm font-extrabold text-[#4E72C8]"
+        : "flex-1 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-[11px] text-sm font-extrabold text-[#6E6359]";
+
+    private Task HandleValidSubmit() => CloseAsync(OnSave);
+
+    private Task HandleCancelAsync() => CloseAsync(OnCancel);
+
+    private Task HandleBackdropClickAsync() => CloseAsync(OnCancel);
+
+    private Task HandleKeyDownAsync(KeyboardEventArgs args) => args.Key == "Escape"
+        ? CloseAsync(OnCancel)
+        : Task.CompletedTask;
+
+    private async Task CloseAsync(EventCallback callback)
+    {
+        ResetDraft();
+        await callback.InvokeAsync();
+    }
+
+    private void ResetDraft()
+    {
+        draft = new LinkParentDraft();
+    }
+
+    private sealed class LinkParentDraft
+    {
+        [Required(ErrorMessage = "Introduce el nombre completo.")]
+        public string FullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Introduce el email.")]
+        [EmailAddress(ErrorMessage = "Introduce un email válido.")]
+        public string Email { get; set; } = string.Empty;
+        public string Relationship { get; set; } = "Mamá";
+    }
+}
