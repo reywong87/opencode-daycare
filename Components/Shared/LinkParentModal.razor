@@ -25,20 +25,21 @@
 
                 <div class="mb-[18px]">
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="parent-full-name">NOMBRE DEL PADRE/MADRE</label>
-                    <input id="parent-full-name" type="text" autocomplete="name" placeholder="Ej. Diego Fernández" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <input id="parent-full-name" type="text" autocomplete="name" placeholder="Ej. Diego Fernández" @bind="draft.FullName" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
                 </div>
 
                 <div class="mb-[18px]">
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="parent-email">EMAIL</label>
-                    <input id="parent-email" type="email" autocomplete="email" placeholder="correo@ejemplo.com" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <input id="parent-email" type="email" autocomplete="email" placeholder="correo@ejemplo.com" @bind="draft.Email" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
                 </div>
 
                 <fieldset class="mb-5">
                     <legend class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">PARENTESCO</legend>
                     <div class="flex gap-[9px]">
-                        <button type="button" aria-pressed="true" class="flex-1 rounded-full border-[1.5px] border-[#9FB8EC] bg-[#CCD8F4] py-[11px] text-sm font-extrabold text-[#4E72C8]">Mamá</button>
-                        <button type="button" aria-pressed="false" class="flex-1 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-[11px] text-sm font-extrabold text-[#6E6359]">Papá</button>
-                        <button type="button" aria-pressed="false" class="flex-1 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-[11px] text-sm font-extrabold text-[#6E6359]">Tutor/a</button>
+                        @foreach (var relationship in Relationships)
+                        {
+                            <button type="button" aria-pressed="@(draft.Relationship == relationship)" class="@GetRelationshipClass(relationship)" @onclick="() => draft.Relationship = relationship">@relationship</button>
+                        }
                     </div>
                 </fieldset>
 
@@ -66,4 +67,18 @@
 
     [Parameter]
     public string KidName { get; set; } = string.Empty;
+
+    private static readonly string[] Relationships = ["Mamá", "Papá", "Tutor/a"];
+    private readonly LinkParentDraft draft = new();
+
+    private string GetRelationshipClass(string relationship) => draft.Relationship == relationship
+        ? "flex-1 rounded-full border-[1.5px] border-[#9FB8EC] bg-[#CCD8F4] py-[11px] text-sm font-extrabold text-[#4E72C8]"
+        : "flex-1 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-[11px] text-sm font-extrabold text-[#6E6359]";
+
+    private sealed class LinkParentDraft
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Relationship { get; set; } = "Mamá";
+    }
 }
