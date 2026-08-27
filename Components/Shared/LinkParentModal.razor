@@ -2,14 +2,14 @@
 
 @if (IsOpen)
 {
-    <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
-        <section class="w-full max-w-[480px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="link-parent-title">
+    <div @ref="modalOverlay" @onclick="HandleBackdropClickAsync" @onkeydown="HandleKeyDownAsync" tabindex="-1" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
+        <section @onclick:stopPropagation="true" class="w-full max-w-[480px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="link-parent-title">
             <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
                 <div>
                     <h2 id="link-parent-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Vincular padre</h2>
                     <p class="text-[13px] text-[#A89A8B]">a @KidName</p>
                 </div>
-                <button type="button" class="flex size-[34px] items-center justify-center rounded-[10px] bg-[#F0E6D8] text-[#94887B]" aria-label="Cerrar modal">
+                <button type="button" class="flex size-[34px] items-center justify-center rounded-[10px] bg-[#F0E6D8] text-[#94887B]" aria-label="Cerrar modal" @onclick="HandleCancelAsync">
                     <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M18 6 6 18M6 6l12 12" />
                     </svg>
@@ -73,15 +73,60 @@
     [Parameter]
     public string KidName { get; set; } = string.Empty;
 
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
     private static readonly string[] Relationships = ["Mamá", "Papá", "Tutor/a"];
-    private readonly LinkParentDraft draft = new();
+    private LinkParentDraft draft = new();
+    private ElementReference modalOverlay;
+    private bool shouldFocusModal;
+    private bool wasOpen;
+
+    protected override void OnParametersSet()
+    {
+        if (IsOpen && !wasOpen)
+        {
+            shouldFocusModal = true;
+        }
+
+        wasOpen = IsOpen;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (shouldFocusModal)
+        {
+            shouldFocusModal = false;
+            await modalOverlay.FocusAsync(preventScroll: true);
+        }
+    }
 
     private string GetRelationshipClass(string relationship) => draft.Relationship == relationship
         ? "flex-1 rounded-full border-[1.5px] border-[#9FB8EC] bg-[#CCD8F4] py-[11px] text-sm font-extrabold text-[#4E72C8]"
         : "flex-1 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-[11px] text-sm font-extrabold text-[#6E6359]";
 
-    private void HandleValidSubmit()
+    private Task HandleValidSubmit() => CloseAsync(OnSave);
+
+    private Task HandleCancelAsync() => CloseAsync(OnCancel);
+
+    private Task HandleBackdropClickAsync() => CloseAsync(OnCancel);
+
+    private Task HandleKeyDownAsync(KeyboardEventArgs args) => args.Key == "Escape"
+        ? CloseAsync(OnCancel)
+        : Task.CompletedTask;
+
+    private async Task CloseAsync(EventCallback callback)
     {
+        ResetDraft();
+        await callback.InvokeAsync();
+    }
+
+    private void ResetDraft()
+    {
+        draft = new LinkParentDraft();
     }
 
     private sealed class LinkParentDraft
