@@ -11,7 +11,16 @@
             <form class="px-[26px] py-6" novalidate>
                 <fieldset class="mb-[22px]">
                     <legend class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">PARA</legend>
-                    <div class="flex flex-wrap gap-[9px]"></div>
+                    <div class="flex flex-wrap gap-[9px]">
+                        @foreach (var kid in KidCatalog.All)
+                        {
+                            <button type="button" aria-pressed="@selectedKidSlugs.Contains(kid.Slug)" class="@GetKidChipClass(kid.Slug)" @onclick="() => ToggleKid(kid.Slug)">
+                                <span class="flex size-[26px] items-center justify-center rounded-full font-fredoka text-[13px] font-semibold @kid.AvatarBackgroundClass @kid.AvatarTextClass">@kid.Initials</span>
+                                @kid.FullName
+                            </button>
+                        }
+                        <button type="button" aria-pressed="@isRoomSelected" class="@GetRoomChipClass()" @onclick="ToggleRoom">Toda la sala</button>
+                    </div>
                 </fieldset>
 
                 <fieldset class="mb-[22px]">
@@ -50,4 +59,35 @@
 @code {
     [Parameter]
     public bool IsOpen { get; set; }
+
+    private readonly HashSet<string> selectedKidSlugs = [];
+    private bool isRoomSelected;
+
+    private string GetKidChipClass(string slug) => selectedKidSlugs.Contains(slug)
+        ? "flex items-center gap-2 rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] py-1 pr-[14px] pl-1 text-sm font-bold text-white"
+        : "flex items-center gap-2 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-1 pr-[14px] pl-1 text-sm font-bold text-[#6E6359]";
+
+    private string GetRoomChipClass() => isRoomSelected
+        ? "rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] px-4 py-[7px] text-sm font-bold text-white"
+        : "rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] px-4 py-[7px] text-sm font-bold text-[#6E6359]";
+
+    private void ToggleKid(string slug)
+    {
+        isRoomSelected = false;
+
+        if (!selectedKidSlugs.Add(slug))
+        {
+            selectedKidSlugs.Remove(slug);
+        }
+    }
+
+    private void ToggleRoom()
+    {
+        isRoomSelected = !isRoomSelected;
+
+        if (isRoomSelected)
+        {
+            selectedKidSlugs.Clear();
+        }
+    }
 }
