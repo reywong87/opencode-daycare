@@ -1,9 +1,9 @@
 @if (IsOpen)
 {
-    <div class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
-        <section class="w-full max-w-[580px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="create-post-title">
+    <div @ref="modalOverlay" @onclick="HandleBackdropClickAsync" @onkeydown="HandleKeyDownAsync" tabindex="-1" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
+        <section @onclick:stopPropagation="true" class="w-full max-w-[580px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="create-post-title">
             <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
-                <button type="button" class="text-[15px] font-bold text-[#94887B]">Cancelar</button>
+                <button type="button" class="text-[15px] font-bold text-[#94887B]" @onclick="HandleCancelAsync">Cancelar</button>
                 <h2 id="create-post-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Nueva publicación</h2>
                 <button type="button" class="text-[15px] font-extrabold text-[#D9583C]" @onclick="HandlePublish">Publicar</button>
             </header>
@@ -73,10 +73,38 @@
     [Parameter]
     public bool IsOpen { get; set; }
 
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
     private static readonly string[] PostKinds = ["Comida", "Siesta", "Actividad", "Logro", "Ánimo", "Foto", "Anuncio"];
-    private readonly CreatePostDraft draft = new();
+    private CreatePostDraft draft = new();
     private string? recipientError;
     private string? descriptionError;
+    private ElementReference modalOverlay;
+    private bool shouldFocusModal;
+    private bool wasOpen;
+
+    protected override void OnParametersSet()
+    {
+        if (IsOpen && !wasOpen)
+        {
+            shouldFocusModal = true;
+        }
+
+        wasOpen = IsOpen;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (shouldFocusModal)
+        {
+            shouldFocusModal = false;
+            await modalOverlay.FocusAsync(preventScroll: true);
+        }
+    }
 
     private string GetKidChipClass(string slug) => draft.SelectedKidSlugs.Contains(slug)
         ? "flex items-center gap-2 rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] py-1 pr-[14px] pl-1 text-sm font-bold text-white"
@@ -123,7 +151,7 @@
         }
     }
 
-    private void HandlePublish()
+    private async Task HandlePublish()
     {
         recipientError = draft.SelectedKidSlugs.Count == 0 && !draft.IsRoomSelected
             ? "Selecciona al menos un destinatario."
@@ -136,6 +164,29 @@
         {
             return;
         }
+
+        await CloseAsync(OnSave);
+    }
+
+    private Task HandleCancelAsync() => CloseAsync(OnCancel);
+
+    private Task HandleBackdropClickAsync() => CloseAsync(OnCancel);
+
+    private Task HandleKeyDownAsync(KeyboardEventArgs args) => args.Key == "Escape"
+        ? CloseAsync(OnCancel)
+        : Task.CompletedTask;
+
+    private async Task CloseAsync(EventCallback callback)
+    {
+        ResetDraft();
+        await callback.InvokeAsync();
+    }
+
+    private void ResetDraft()
+    {
+        draft = new CreatePostDraft();
+        recipientError = null;
+        descriptionError = null;
     }
 
     private sealed class CreatePostDraft
