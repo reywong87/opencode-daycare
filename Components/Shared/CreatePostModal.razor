@@ -14,23 +14,28 @@
                     <div class="flex flex-wrap gap-[9px]">
                         @foreach (var kid in KidCatalog.All)
                         {
-                            <button type="button" aria-pressed="@selectedKidSlugs.Contains(kid.Slug)" class="@GetKidChipClass(kid.Slug)" @onclick="() => ToggleKid(kid.Slug)">
+                            <button type="button" aria-pressed="@draft.SelectedKidSlugs.Contains(kid.Slug)" class="@GetKidChipClass(kid.Slug)" @onclick="() => ToggleKid(kid.Slug)">
                                 <span class="flex size-[26px] items-center justify-center rounded-full font-fredoka text-[13px] font-semibold @kid.AvatarBackgroundClass @kid.AvatarTextClass">@kid.Initials</span>
                                 @kid.FullName
                             </button>
                         }
-                        <button type="button" aria-pressed="@isRoomSelected" class="@GetRoomChipClass()" @onclick="ToggleRoom">Toda la sala</button>
+                        <button type="button" aria-pressed="@draft.IsRoomSelected" class="@GetRoomChipClass()" @onclick="ToggleRoom">Toda la sala</button>
                     </div>
                 </fieldset>
 
                 <fieldset class="mb-[22px]">
                     <legend class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">TIPO</legend>
-                    <div class="flex flex-wrap gap-[9px]"></div>
+                    <div class="flex flex-wrap gap-[9px]">
+                        @foreach (var kind in PostKinds)
+                        {
+                            <button type="button" aria-pressed="@(draft.Kind == kind)" class="@GetKindClass(kind)" @onclick="() => draft.Kind = kind">@kind</button>
+                        }
+                    </div>
                 </fieldset>
 
                 <div class="mb-[22px]">
                     <label class="mb-2.5 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="post-description">DESCRIPCIÓN</label>
-                    <textarea id="post-description" placeholder="Cuenta cómo le fue hoy…" class="min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[14px] text-[15px] leading-[1.5] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
+                    <textarea id="post-description" placeholder="Cuenta cómo le fue hoy…" @bind="draft.Description" @bind:event="oninput" class="min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[14px] text-[15px] leading-[1.5] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
                 </div>
 
                 <section aria-labelledby="post-photos-title">
@@ -60,34 +65,59 @@
     [Parameter]
     public bool IsOpen { get; set; }
 
-    private readonly HashSet<string> selectedKidSlugs = [];
-    private bool isRoomSelected;
+    private static readonly string[] PostKinds = ["Comida", "Siesta", "Actividad", "Logro", "Ánimo", "Foto", "Anuncio"];
+    private readonly CreatePostDraft draft = new();
 
-    private string GetKidChipClass(string slug) => selectedKidSlugs.Contains(slug)
+    private string GetKidChipClass(string slug) => draft.SelectedKidSlugs.Contains(slug)
         ? "flex items-center gap-2 rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] py-1 pr-[14px] pl-1 text-sm font-bold text-white"
         : "flex items-center gap-2 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-1 pr-[14px] pl-1 text-sm font-bold text-[#6E6359]";
 
-    private string GetRoomChipClass() => isRoomSelected
+    private string GetRoomChipClass() => draft.IsRoomSelected
         ? "rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] px-4 py-[7px] text-sm font-bold text-white"
         : "rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] px-4 py-[7px] text-sm font-bold text-[#6E6359]";
 
+    private string GetKindClass(string kind)
+    {
+        var colorClass = kind switch
+        {
+            "Comida" => "bg-[#9A7B1E] text-white",
+            "Siesta" => "bg-[#E7DCF6] text-[#7B5FC0]",
+            "Actividad" => "bg-[#2E89A6] text-white",
+            "Logro" => "bg-[#CFEBD8] text-[#3E9B6C]",
+            "Ánimo" => "bg-[#F9D2DE] text-[#C56486]",
+            "Foto" => "bg-[#FBD8CC] text-[#D9684A]",
+            "Anuncio" => "bg-[#CCD8F4] text-[#4E72C8]",
+            _ => string.Empty
+        };
+
+        return $"rounded-full border-0 px-4 py-2 text-[13.5px] font-extrabold {colorClass} {(draft.Kind == kind ? "ring-2 ring-[#3F362E] ring-offset-2" : string.Empty)}";
+    }
+
     private void ToggleKid(string slug)
     {
-        isRoomSelected = false;
+        draft.IsRoomSelected = false;
 
-        if (!selectedKidSlugs.Add(slug))
+        if (!draft.SelectedKidSlugs.Add(slug))
         {
-            selectedKidSlugs.Remove(slug);
+            draft.SelectedKidSlugs.Remove(slug);
         }
     }
 
     private void ToggleRoom()
     {
-        isRoomSelected = !isRoomSelected;
+        draft.IsRoomSelected = !draft.IsRoomSelected;
 
-        if (isRoomSelected)
+        if (draft.IsRoomSelected)
         {
-            selectedKidSlugs.Clear();
+            draft.SelectedKidSlugs.Clear();
         }
+    }
+
+    private sealed class CreatePostDraft
+    {
+        public HashSet<string> SelectedKidSlugs { get; } = [];
+        public bool IsRoomSelected { get; set; }
+        public string Kind { get; set; } = "Comida";
+        public string Description { get; set; } = string.Empty;
     }
 }
