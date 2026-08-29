@@ -5,10 +5,10 @@
             <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
                 <button type="button" class="text-[15px] font-bold text-[#94887B]">Cancelar</button>
                 <h2 id="create-post-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Nueva publicación</h2>
-                <button type="button" class="text-[15px] font-extrabold text-[#D9583C]">Publicar</button>
+                <button type="button" class="text-[15px] font-extrabold text-[#D9583C]" @onclick="HandlePublish">Publicar</button>
             </header>
 
-            <form class="px-[26px] py-6" novalidate>
+            <form class="px-[26px] py-6" novalidate @onsubmit:preventDefault="true">
                 <fieldset class="mb-[22px]">
                     <legend class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">PARA</legend>
                     <div class="flex flex-wrap gap-[9px]">
@@ -21,6 +21,10 @@
                         }
                         <button type="button" aria-pressed="@draft.IsRoomSelected" class="@GetRoomChipClass()" @onclick="ToggleRoom">Toda la sala</button>
                     </div>
+                    @if (recipientError is not null)
+                    {
+                        <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@recipientError</p>
+                    }
                 </fieldset>
 
                 <fieldset class="mb-[22px]">
@@ -36,6 +40,10 @@
                 <div class="mb-[22px]">
                     <label class="mb-2.5 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="post-description">DESCRIPCIÓN</label>
                     <textarea id="post-description" placeholder="Cuenta cómo le fue hoy…" @bind="draft.Description" @bind:event="oninput" class="min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[14px] text-[15px] leading-[1.5] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
+                    @if (descriptionError is not null)
+                    {
+                        <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@descriptionError</p>
+                    }
                 </div>
 
                 <section aria-labelledby="post-photos-title">
@@ -67,6 +75,8 @@
 
     private static readonly string[] PostKinds = ["Comida", "Siesta", "Actividad", "Logro", "Ánimo", "Foto", "Anuncio"];
     private readonly CreatePostDraft draft = new();
+    private string? recipientError;
+    private string? descriptionError;
 
     private string GetKidChipClass(string slug) => draft.SelectedKidSlugs.Contains(slug)
         ? "flex items-center gap-2 rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] py-1 pr-[14px] pl-1 text-sm font-bold text-white"
@@ -110,6 +120,21 @@
         if (draft.IsRoomSelected)
         {
             draft.SelectedKidSlugs.Clear();
+        }
+    }
+
+    private void HandlePublish()
+    {
+        recipientError = draft.SelectedKidSlugs.Count == 0 && !draft.IsRoomSelected
+            ? "Selecciona al menos un destinatario."
+            : null;
+        descriptionError = string.IsNullOrWhiteSpace(draft.Description)
+            ? "Escribe una descripción."
+            : null;
+
+        if (recipientError is not null || descriptionError is not null)
+        {
+            return;
         }
     }
 
