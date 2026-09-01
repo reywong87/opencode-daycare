@@ -65,29 +65,29 @@ El borrador inicia con `SelectedKidSlugs` vacío, `IsRoomSelected` en `false`, `
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] Pulsar `Nueva publicación` en la barra lateral abre el modal sin navegar.
-- [ ] El disparador `Compartí un momento…` de `/` no abre el modal.
-- [ ] El encabezado muestra `Cancelar`, `Nueva publicación` y `Publicar`.
-- [ ] El modal ofrece un chip por cada niño de `KidCatalog.All` con sus iniciales y colores de avatar.
-- [ ] El modal ofrece el chip `Toda la sala`.
-- [ ] Se pueden seleccionar varios niños individuales.
-- [ ] Seleccionar `Toda la sala` deselecciona los niños y seleccionar un niño deselecciona `Toda la sala`.
-- [ ] El modal inicia sin destinatarios seleccionados.
-- [ ] El modal ofrece exactamente `Comida`, `Siesta`, `Actividad`, `Logro`, `Ánimo`, `Foto` y `Anuncio`.
-- [ ] `Comida` inicia como tipo seleccionado y se puede cambiar a cualquiera de los otros tipos.
-- [ ] La descripción inicia vacía y muestra el placeholder `Cuenta cómo le fue hoy…`.
-- [ ] La sección Fotos muestra la composición visual del mockup y no abre un selector de archivos.
-- [ ] Publicar sin destinatario muestra un error local y mantiene abierto el modal.
-- [ ] Publicar sin descripción muestra un error local y mantiene abierto el modal.
-- [ ] Publicar con uno o varios destinatarios y una descripción no vacía cierra el modal.
-- [ ] Publicar con datos válidos no añade una tarjeta, no modifica `Home.razor`, no realiza solicitudes de API y no persiste datos.
-- [ ] Cancelar, pulsar el fondo y Escape cierran el modal.
-- [ ] Pulsar dentro del panel no cierra el modal.
-- [ ] Al reabrir, no hay destinatarios seleccionados, `Comida` está seleccionado, la descripción está vacía y no se muestran errores anteriores.
-- [ ] A 1440px, el modal reproduce la composición del mockup sobre una ruta con `MainLayout`.
-- [ ] A 390px, el modal permanece legible, navegable y sin desbordamiento horizontal.
-- [ ] Al abrir el modal, recibe el foco de teclado para que Escape pueda cerrarlo.
+- [x] `dotnet build` termina sin errores.
+- [x] Pulsar `Nueva publicación` en la barra lateral abre el modal sin navegar.
+- [x] El disparador `Compartí un momento…` de `/` no abre el modal.
+- [x] El encabezado muestra `Cancelar`, `Nueva publicación` y `Publicar`.
+- [x] El modal ofrece un chip por cada niño de `KidCatalog.All` con sus iniciales y colores de avatar.
+- [x] El modal ofrece el chip `Toda la sala`.
+- [x] Se pueden seleccionar varios niños individuales.
+- [x] Seleccionar `Toda la sala` deselecciona los niños y seleccionar un niño deselecciona `Toda la sala`.
+- [x] El modal inicia sin destinatarios seleccionados.
+- [x] El modal ofrece exactamente `Comida`, `Siesta`, `Actividad`, `Logro`, `Ánimo`, `Foto` y `Anuncio`.
+- [x] `Comida` inicia como tipo seleccionado y se puede cambiar a cualquiera de los otros tipos.
+- [x] La descripción inicia vacía y muestra el placeholder `Cuenta cómo le fue hoy…`.
+- [x] La sección Fotos muestra la composición visual del mockup y no abre un selector de archivos.
+- [x] Publicar sin destinatario muestra un error local y mantiene abierto el modal.
+- [x] Publicar sin descripción muestra un error local y mantiene abierto el modal.
+- [x] Publicar con uno o varios destinatarios y una descripción no vacía cierra el modal.
+- [x] Publicar con datos válidos no añade una tarjeta, no modifica `Home.razor`, no realiza solicitudes de API y no persiste datos.
+- [x] Cancelar, pulsar el fondo y Escape cierran el modal.
+- [x] Pulsar dentro del panel no cierra el modal.
+- [x] Al reabrir, no hay destinatarios seleccionados, `Comida` está seleccionado, la descripción está vacía y no se muestran errores anteriores.
+- [x] A 1440px, el modal reproduce la composición del mockup sobre una ruta con `MainLayout`.
+- [x] A 390px, el modal permanece legible, navegable y sin desbordamiento horizontal.
+- [x] Al abrir el modal, recibe el foco de teclado para que Escape pueda cerrarlo.
 
 ## Decisions
 
