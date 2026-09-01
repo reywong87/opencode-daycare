@@ -107,12 +107,12 @@
     }
 
     private string GetKidChipClass(string slug) => draft.SelectedKidSlugs.Contains(slug)
-        ? "flex items-center gap-2 rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] py-1 pr-[14px] pl-1 text-sm font-bold text-white"
-        : "flex items-center gap-2 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-1 pr-[14px] pl-1 text-sm font-bold text-[#6E6359]";
+        ? "flex items-center gap-2 rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] py-[6px] pr-[14px] pl-[6px] text-sm font-bold text-white"
+        : "flex items-center gap-2 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-[6px] pr-[14px] pl-[6px] text-sm font-bold text-[#6E6359]";
 
     private string GetRoomChipClass() => draft.IsRoomSelected
-        ? "rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] px-4 py-[7px] text-sm font-bold text-white"
-        : "rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] px-4 py-[7px] text-sm font-bold text-[#6E6359]";
+        ? "rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] px-4 py-[6px] text-sm font-bold text-white"
+        : "rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] px-4 py-[6px] text-sm font-bold text-[#6E6359]";
 
     private string GetKindClass(string kind)
     {
