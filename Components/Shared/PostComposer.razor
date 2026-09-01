@@ -1,0 +1,17 @@
+<Sidebar OnNewPost="OpenCreatePostModal" />
+
+<CreatePostModal IsOpen="isCreatePostModalOpen" OnCancel="CloseCreatePostModal" OnSave="CloseCreatePostModal" />
+
+@code {
+    private bool isCreatePostModalOpen;
+
+    private void OpenCreatePostModal()
+    {
+        isCreatePostModalOpen = true;
+    }
+
+    private void CloseCreatePostModal()
+    {
+        isCreatePostModalOpen = false;
+    }
+}
