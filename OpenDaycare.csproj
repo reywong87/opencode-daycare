@@ -54,4 +54,8 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js.map" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Supabase" Version="1.6.2" />
+    </ItemGroup>
+
 </Project>
