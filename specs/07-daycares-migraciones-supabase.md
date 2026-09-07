@@ -59,19 +59,19 @@ Cada aplicación debe verificarse antes de continuar al siguiente paso. No se re
 
 ## Acceptance criteria
 
-- [ ] Las migraciones `create_daycares` y `seed_daycares` existen tanto en Git como en el historial remoto, con versiones y contenido coincidentes.
-- [ ] `public.daycares` contiene únicamente las columnas `id`, `name` y `created_at`, con los tipos y restricciones definidos.
-- [ ] Una inserción válida que omite `id` y `created_at` genera ambos valores.
-- [ ] Se rechazan nombres nulos, vacíos o compuestos únicamente por espacios.
-- [ ] Se permiten guarderías distintas con el mismo nombre.
-- [ ] RLS está habilitado y no existen políticas de acceso para clientes.
-- [ ] Los roles `anon` y `authenticated` no pueden consultar ni modificar registros, comprobado mediante pruebas de permisos.
-- [ ] La tabla contiene exactamente las cuatro guarderías acordadas al finalizar la implementación.
-- [ ] Las pruebas de escritura se revierten y no dejan registros adicionales.
-- [ ] No se han creado tablas de dominio adicionales ni modificado Blazor.
-- [ ] Se han consultado los asesores de seguridad y rendimiento después de los cambios y resuelto los hallazgos atribuibles a esta funcionalidad.
-- [ ] `supabase/README.md` explica cómo aplicar futuras migraciones sin duplicar ejecuciones ni desalinear el historial.
-- [ ] `dotnet build` termina sin errores.
+- [x] Las migraciones `create_daycares` y `seed_daycares` existen tanto en Git como en el historial remoto, con versiones y contenido coincidentes.
+- [x] `public.daycares` contiene únicamente las columnas `id`, `name` y `created_at`, con los tipos y restricciones definidos.
+- [x] Una inserción válida que omite `id` y `created_at` genera ambos valores.
+- [x] Se rechazan nombres nulos, vacíos o compuestos únicamente por espacios.
+- [x] Se permiten guarderías distintas con el mismo nombre.
+- [x] RLS está habilitado y no existen políticas de acceso para clientes.
+- [x] Los roles `anon` y `authenticated` no pueden consultar ni modificar registros, comprobado mediante pruebas de permisos.
+- [x] La tabla contiene exactamente las cuatro guarderías acordadas al finalizar la implementación.
+- [x] Las pruebas de escritura se revierten y no dejan registros adicionales.
+- [x] No se han creado tablas de dominio adicionales ni modificado Blazor.
+- [x] Se han consultado los asesores de seguridad y rendimiento después de los cambios y resuelto los hallazgos atribuibles a esta funcionalidad.
+- [x] `supabase/README.md` explica cómo aplicar futuras migraciones sin duplicar ejecuciones ni desalinear el historial.
+- [x] `dotnet build` termina sin errores.
 
 ## Decisions
 
