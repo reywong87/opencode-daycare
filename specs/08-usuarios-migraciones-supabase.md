@@ -1,6 +1,6 @@
 # SPEC 08 — Usuarios y migraciones Supabase
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 07
 > **Date:** 2026-09-07
 > **Objective:** Crear los enums y la tabla `public.users` vinculada a Supabase Auth, con perfil propio protegido y una cuenta staff inicial para pruebas.
@@ -68,25 +68,25 @@ Tabla: `public.users`.
 
 ## Acceptance criteria
 
-- [ ] Existen exactamente los enums `public.user_role` y `public.user_status` definidos en esta especificación.
-- [ ] `public.user_role` contiene `staff`, `parent` y `admin`.
-- [ ] `public.user_status` contiene `pending` y `active`.
-- [ ] `public.users` contiene las columnas, tipos, valores predeterminados y restricciones definidos.
-- [ ] Una inserción válida que omite `created_at` y `updated_at` genera ambos valores.
-- [ ] Se rechaza `full_name` nulo, vacío o compuesto solo por espacios.
-- [ ] Un perfil puede existir sin `daycare_id`.
-- [ ] No se puede eliminar una guardería con perfiles asociados.
-- [ ] Eliminar un usuario de `auth.users` elimina su perfil en `public.users`.
-- [ ] Actualizar un perfil modifica `updated_at`.
-- [ ] RLS está habilitado en `public.users`.
-- [ ] Un usuario autenticado puede leer únicamente su propio perfil.
-- [ ] Un usuario autenticado puede actualizar únicamente su propio `full_name`, `avatar_url` y preferencias.
-- [ ] Un usuario autenticado no puede insertar, eliminar ni modificar su `id`, `daycare_id`, `role`, `status`, `created_at` o `updated_at`.
-- [ ] `rey@google.com` existe en `auth.users` y tiene un perfil asociado con `full_name` `Rey`, rol `staff`, estado `active` y `Guardería Soles`.
-- [ ] La contraseña de prueba no aparece en migraciones, configuración, documentación ni archivos versionados.
+- [x] Existen exactamente los enums `public.user_role` y `public.user_status` definidos en esta especificación.
+- [x] `public.user_role` contiene `staff`, `parent` y `admin`.
+- [x] `public.user_status` contiene `pending` y `active`.
+- [x] `public.users` contiene las columnas, tipos, valores predeterminados y restricciones definidos.
+- [x] Una inserción válida que omite `created_at` y `updated_at` genera ambos valores.
+- [x] Se rechaza `full_name` nulo, vacío o compuesto solo por espacios.
+- [x] Un perfil puede existir sin `daycare_id`.
+- [x] No se puede eliminar una guardería con perfiles asociados.
+- [x] Eliminar un usuario de `auth.users` elimina su perfil en `public.users`.
+- [x] Actualizar un perfil modifica `updated_at`.
+- [x] RLS está habilitado en `public.users`.
+- [x] Un usuario autenticado puede leer únicamente su propio perfil.
+- [x] Un usuario autenticado puede actualizar únicamente su propio `full_name`, `avatar_url` y preferencias.
+- [x] Un usuario autenticado no puede insertar, eliminar ni modificar su `id`, `daycare_id`, `role`, `status`, `created_at` o `updated_at`.
+- [x] `rey@google.com` existe en `auth.users` y tiene un perfil asociado con `full_name` `Rey`, rol `staff`, estado `active` y `Guardería Soles`.
+- [x] La contraseña de prueba no aparece en migraciones, configuración, documentación ni archivos versionados.
 - [ ] Las migraciones locales coinciden con el historial remoto de Supabase.
-- [ ] Los asesores de seguridad y rendimiento no tienen hallazgos atribuibles a esta funcionalidad.
-- [ ] `dotnet build` termina sin errores.
+- [x] Los asesores de seguridad y rendimiento no tienen hallazgos atribuibles a esta funcionalidad.
+- [x] `dotnet build` termina sin errores.
 
 ## Decisions
 
