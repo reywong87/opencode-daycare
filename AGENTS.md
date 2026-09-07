@@ -29,7 +29,9 @@
 - Antes de cambios de esquema, consulta las tablas existentes con `supabase_list_tables`.
 - Aplica DDL únicamente mediante `supabase_apply_migration`; usa `supabase_execute_sql` para consultas o cambios de datos que no sean DDL.
 - Antes de investigar problemas de Supabase, revisa logs y asesores. Tras cambios de esquema, consulta los asesores de seguridad y rendimiento.
-- Para integraciones del cliente, obtén la URL del proyecto y una clave publicable mediante las herramientas de Supabase; nunca expongas claves de servicio en el cliente.
+- La aplicación cliente Blazor interactúa con Supabase mediante paquetes .NET. Centraliza el acceso a datos en servicios .NET inyectables; no uses SDKs de JavaScript ni llamadas HTTP directas desde componentes.
+- Para integraciones del cliente, usa el SDK oficial de Supabase para C# y una clave publicable. Nunca expongas claves de servicio en el cliente; guarda las credenciales de desarrollo en User Secrets o variables de entorno.
+- Todo acceso desde la aplicación cliente debe estar protegido por RLS y políticas de Supabase que apliquen el modelo de autorización correspondiente.
 - Da preferencia al desarrollo y las pruebas locales con la CLI de Supabase cuando esté disponible. Las migraciones y operaciones MCP se aplican al proyecto remoto, por lo que deben usarse con cuidado.
 
 ## Skills
