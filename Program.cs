@@ -6,6 +6,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+var supabaseUrl = builder.Configuration["Supabase:Url"]
+                  ?? throw new InvalidOperationException("Missing Supabase:Url.");
+var supabaseKey = builder.Configuration["Supabase:AnonKey"]
+                  ?? throw new InvalidOperationException("Missing Supabase:AnonKey.");
+
+builder.Services.AddScoped(_ => new Supabase.Client(
+    supabaseUrl,
+    supabaseKey,
+    new Supabase.SupabaseOptions
+    {
+        AutoConnectRealtime = false
+    }));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
