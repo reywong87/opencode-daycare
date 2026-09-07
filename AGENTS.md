@@ -34,6 +34,7 @@
 
 ## Skills
 
+- Todas las especificaciones relacionadas con la base de datos deben ubicarse en `specs/databse/`.
 - `context7-mcp`: consulta documentación vigente para librerías, frameworks, SDKs, APIs, CLIs y servicios en la nube.
 - `find-skills`: localiza e instala skills cuando se necesite una capacidad adicional.
 - `spec`: diseña especificaciones con el flujo spec-driven antes de iniciar una funcionalidad grande.
