@@ -1,0 +1,34 @@
+@inject SupabaseAuthService AuthService
+@inject SupabaseAuthenticationStateProvider AuthenticationStateProvider
+
+@if (isInitialized)
+{
+    <Routes />
+}
+else
+{
+    <main class="flex min-h-screen items-center justify-center bg-[#FBF4EC] px-6 text-[#6E6359]" aria-live="polite">
+        <p class="text-sm font-semibold">Cargando OpenDayCare...</p>
+    </main>
+}
+
+@code {
+    private bool isInitialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var session = await AuthService.RestoreSessionAsync();
+        if (session is not null)
+        {
+            await AuthenticationStateProvider.RefreshAuthenticationStateAsync();
+        }
+
+        isInitialized = true;
+        StateHasChanged();
+    }
+}
