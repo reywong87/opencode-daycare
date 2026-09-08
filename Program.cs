@@ -1,4 +1,5 @@
 using OpenDaycare.Components;
+using OpenDaycare.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddAuthorizationCore();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddDataProtection();
+builder.Services.AddScoped<SupabaseAuthService>();
 
 var supabaseUrl = builder.Configuration["Supabase:Url"]
                   ?? throw new InvalidOperationException("Missing Supabase:Url.");
