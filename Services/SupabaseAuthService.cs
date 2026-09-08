@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.JSInterop;
+using OpenDaycare.Models;
 using Supabase.Gotrue;
+using PostgrestConstants = Supabase.Postgrest.Constants;
 
 namespace OpenDaycare.Services;
 
@@ -78,6 +80,45 @@ public sealed class SupabaseAuthService(
         {
             await ClearPersistedSessionAsync();
         }
+    }
+
+    public async Task<AuthenticatedUser?> GetAuthenticatedUserAsync()
+    {
+        await InitializeAsync();
+
+        var currentUser = supabase.Auth.CurrentUser;
+        if (currentUser is null || !Guid.TryParse(currentUser.Id, out var userId))
+        {
+            return null;
+        }
+
+        var profileResponse = await supabase
+            .From<UserProfileRecord>()
+            .Filter("id", PostgrestConstants.Operator.Equals, currentUser.Id)
+            .Get();
+        var profile = profileResponse.Models.SingleOrDefault();
+        if (profile is null)
+        {
+            return null;
+        }
+
+        string? daycareName = null;
+        if (profile.DaycareId is { } daycareId)
+        {
+            var daycareResponse = await supabase
+                .From<DaycareRecord>()
+                .Filter("id", PostgrestConstants.Operator.Equals, daycareId)
+                .Get();
+            daycareName = daycareResponse.Models.SingleOrDefault()?.Name;
+        }
+
+        return new AuthenticatedUser(
+            userId,
+            currentUser.Email ?? string.Empty,
+            profile.FullName,
+            profile.Role,
+            daycareName,
+            profile.Status);
     }
 
     private async Task PersistSessionAsync(Session session)

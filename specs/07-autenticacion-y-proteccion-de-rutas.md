@@ -13,6 +13,7 @@
 - Persistir la sesión de Supabase en almacenamiento protegido del navegador y restaurarla tras una recarga o visita posterior.
 - Crear un `AuthenticationStateProvider` para exponer la sesión de Supabase a los componentes Blazor.
 - Cargar el perfil propio desde `public.users` y permitir el acceso solo cuando el perfil exista y tenga estado `active`.
+- Permitir mediante RLS que cada usuario autenticado lea únicamente su propia fila de `public.daycares`.
 - Mostrar el `full_name`, el rol y la guardería del perfil autenticado en `Components/Shared/Sidebar.razor` en lugar de los datos demo.
 - Actualizar `Components/Pages/Login.razor` para autenticar contra Supabase, mostrar estados de envío y errores genéricos de credenciales o conexión.
 - Redirigir a una ruta interna solicitada mediante `returnUrl` validado después de iniciar sesión, con `/` como destino predeterminado.
@@ -30,12 +31,14 @@
 - Recuperación o cambio de contraseña.
 - Autorización por rol, guardería, niño o recurso.
 - Crear, editar o sincronizar perfiles de `public.users`.
-- Modificar el esquema, RLS, políticas o datos de Supabase.
+- Modificar tablas, enums, triggers o datos de Supabase fuera de la política de lectura de guarderías definida en esta spec.
 - Inicio de sesión con proveedores sociales, magic links, MFA o passkeys.
 
 ## Data model
 
-Esta funcionalidad no modifica estructuras persistentes de la base de datos.
+Esta funcionalidad no modifica tablas ni datos persistentes de la base de datos.
+
+Añade una política `select` sobre `public.daycares` para `authenticated`. La política permite una fila solo cuando su `id` coincide con el `daycare_id` del perfil cuyo `id` es `auth.uid()`.
 
 Reutiliza `auth.users` y el perfil propio de `public.users` definido en SPEC 08. El estado de aplicación mantendrá una sesión autenticada y el perfil asociado:
 
@@ -57,15 +60,16 @@ La sesión serializada de Supabase se guardará bajo una clave de almacenamiento
 
 1. Actualizar `Program.cs` para registrar los servicios de autorización, estado autenticado, almacenamiento protegido y los servicios de autenticación y perfil de OpenDaycare.
 2. Crear `Services/SupabaseAuthService.cs` para inicializar el cliente Supabase, iniciar sesión con email y contraseña, restaurar una sesión persistida y cerrar sesión sin exponer credenciales ni claves de servicio.
-3. Crear el modelo de perfil autenticado y añadir al servicio la consulta del perfil propio de `public.users`, incluida su guardería, mediante las políticas RLS existentes.
-4. Crear `Services/SupabaseAuthenticationStateProvider.cs` para convertir una sesión con perfil activo en un `ClaimsPrincipal` y notificar a Blazor cada cambio de autenticación.
-5. Crear un componente interactivo de inicialización de autenticación que restaure el almacenamiento protegido después de la conexión del circuito y no renderice rutas privadas antes de resolver la sesión.
-6. Actualizar `Components/App.razor` para envolver el enrutado en el inicializador y el estado de autenticación en cascada.
-7. Actualizar `Components/Routes.razor` para usar `AuthorizeRouteView`, enviar personas anónimas al login con un retorno interno seguro y mantener una lista explícita de rutas públicas.
-8. Declarar protegidas las páginas funcionales actuales: `/`, `/kids`, `/kids/{Slug}`, `/counter` y `/weather`; mantener públicas las cuatro rutas excluidas en el alcance.
-9. Actualizar `Components/Pages/Login.razor` para enviar email y contraseña al servicio, deshabilitar el formulario durante el envío, comunicar errores genéricos y navegar al retorno validado después de autenticar y validar el perfil.
-10. Actualizar `Components/Shared/Sidebar.razor` para mostrar `full_name`, rol y guardería del perfil autenticado, y conectar su botón de salida al servicio de autenticación.
-11. Verificar compilación, restauración de sesión, navegación anónima, redirección de retorno, perfil inexistente o inactivo, errores de acceso y cierre de sesión en navegador.
+3. Crear, aplicar y versionar la migración de RLS que concede `select` sobre `public.daycares` únicamente a cada usuario autenticado para su propia guardería.
+4. Crear el modelo de perfil autenticado y añadir al servicio la consulta del perfil propio de `public.users`, incluida su guardería, mediante las políticas RLS.
+5. Crear `Services/SupabaseAuthenticationStateProvider.cs` para convertir una sesión con perfil activo en un `ClaimsPrincipal` y notificar a Blazor cada cambio de autenticación.
+6. Crear un componente interactivo de inicialización de autenticación que restaure el almacenamiento protegido después de la conexión del circuito y no renderice rutas privadas antes de resolver la sesión.
+7. Actualizar `Components/App.razor` para envolver el enrutado en el inicializador y el estado de autenticación en cascada.
+8. Actualizar `Components/Routes.razor` para usar `AuthorizeRouteView`, enviar personas anónimas al login con un retorno interno seguro y mantener una lista explícita de rutas públicas.
+9. Declarar protegidas las páginas funcionales actuales: `/`, `/kids`, `/kids/{Slug}`, `/counter` y `/weather`; mantener públicas las cuatro rutas excluidas en el alcance.
+10. Actualizar `Components/Pages/Login.razor` para enviar email y contraseña al servicio, deshabilitar el formulario durante el envío, comunicar errores genéricos y navegar al retorno validado después de autenticar y validar el perfil.
+11. Actualizar `Components/Shared/Sidebar.razor` para mostrar `full_name`, rol y guardería del perfil autenticado, y conectar su botón de salida al servicio de autenticación.
+12. Verificar compilación, restauración de sesión, navegación anónima, redirección de retorno, perfil inexistente o inactivo, errores de acceso y cierre de sesión en navegador.
 
 ## Acceptance criteria
 
@@ -82,6 +86,7 @@ La sesión serializada de Supabase se guardará bajo una clave de almacenamiento
 - [ ] `/activate-account` y el enlace `Activa tu cuenta` siguen siendo visuales y no crean cuentas ni sesiones.
 - [ ] Tras recargar el navegador o abrir una nueva visita, una sesión válida se restaura y conserva el acceso a las rutas privadas.
 - [ ] Si la sesión restaurada no tiene perfil en `public.users` o su perfil no está `active`, se elimina la sesión y se bloquea el acceso a rutas privadas.
+- [ ] Un usuario autenticado puede leer el nombre de su propia guardería y no puede leer ninguna otra fila de `public.daycares`.
 - [ ] La barra lateral muestra el nombre completo, rol y guardería del perfil propio autenticado en vez de `Caro Giménez` y `Maestra · Soles`.
 - [ ] Pulsar `Cerrar sesión` revoca o cierra la sesión de Supabase, elimina la sesión almacenada y redirige a `/login`.
 - [ ] Tras cerrar sesión, abrir una ruta privada vuelve a redirigir a `/login`.
@@ -99,6 +104,7 @@ La sesión serializada de Supabase se guardará bajo una clave de almacenamiento
 - **Sí:** mensaje genérico para credenciales y mensaje temporal para red. Protege información de cuentas y permite distinguir problemas recuperables.
 - **Sí:** exigir un perfil activo en `public.users`. Una identidad válida de Auth sin perfil autorizado no puede acceder a la aplicación.
 - **Sí:** mostrar el perfil propio real en la barra lateral. `public.users` ya dispone de RLS para su lectura por el usuario correspondiente.
+- **Sí:** habilitar una política de lectura de la guardería propia. El perfil solo almacena `daycare_id` y el nombre debe seguir protegido por RLS.
 - **No:** recuperación de contraseña. El enlace existente seguirá siendo visual hasta una especificación dedicada.
 
 ## Risks
@@ -116,5 +122,5 @@ La sesión serializada de Supabase se guardará bajo una clave de almacenamiento
 - Registro, invitaciones o activación funcional de cuentas.
 - Recuperación, cambio o políticas de complejidad de contraseña.
 - Permisos por rol, guardería, niño, publicación u otro recurso.
-- Cambios de esquema, políticas RLS, migraciones o datos de Supabase.
+- Cambios de tablas, enums, triggers, datos o políticas RLS fuera de la lectura de la guardería propia.
 - Proveedores sociales, magic links, MFA, passkeys o autenticación sin contraseña.
