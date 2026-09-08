@@ -19,7 +19,7 @@
 - Redirigir a una ruta interna solicitada mediante `returnUrl` validado después de iniciar sesión, con `/` como destino predeterminado.
 - Redirigir a una ruta privada solicitada por una persona anónima hacia `/login` con su ruta de retorno.
 - Impedir que una persona con sesión activa vea el formulario de `/login` y redirigirla a su retorno válido o al feed.
-- Aplicar autorización a las rutas funcionales actuales y hacer que las nuevas rutas funcionales se declaren protegidas por defecto.
+- Aplicar autorización por denegación predeterminada a las rutas funcionales actuales y a las nuevas rutas que no estén en la lista pública.
 - Mantener públicas `/login`, `/activate-account`, `/not-found` y `/Error`.
 - Mantener `Components/Pages/ActivateAccount.razor` y el enlace `Activa tu cuenta` como interfaz visual sin crear cuentas ni sesiones.
 - Conectar el botón existente `Cerrar sesión` de `Components/Shared/Sidebar.razor` para cerrar la sesión remota, eliminar la sesión local y navegar a `/login`.
@@ -65,8 +65,8 @@ La sesión serializada de Supabase se guardará bajo una clave de almacenamiento
 5. Crear `Services/SupabaseAuthenticationStateProvider.cs` para convertir una sesión con perfil activo en un `ClaimsPrincipal` y notificar a Blazor cada cambio de autenticación.
 6. Crear un componente interactivo de inicialización de autenticación que restaure el almacenamiento protegido después de la conexión del circuito y no renderice rutas privadas antes de resolver la sesión.
 7. Actualizar `Components/App.razor` para envolver el enrutado en el inicializador y el estado de autenticación en cascada.
-8. Actualizar `Components/Routes.razor` para usar `AuthorizeRouteView`, enviar personas anónimas al login con un retorno interno seguro y mantener una lista explícita de rutas públicas.
-9. Declarar protegidas las páginas funcionales actuales: `/`, `/kids`, `/kids/{Slug}`, `/counter` y `/weather`; mantener públicas las cuatro rutas excluidas en el alcance.
+8. Actualizar `Components/Routes.razor` para usar `AuthorizeView`, enviar personas anónimas al login con un retorno interno seguro y mantener una lista explícita de rutas públicas.
+9. Mantener protegidas por denegación predeterminada las páginas funcionales actuales: `/`, `/kids`, `/kids/{Slug}`, `/counter` y `/weather`; mantener públicas las cuatro rutas excluidas en el alcance.
 10. Actualizar `Components/Pages/Login.razor` para enviar email y contraseña al servicio, deshabilitar el formulario durante el envío, comunicar errores genéricos y navegar al retorno validado después de autenticar y validar el perfil.
 11. Actualizar `Components/Shared/Sidebar.razor` para mostrar `full_name`, rol y guardería del perfil autenticado, y conectar su botón de salida al servicio de autenticación.
 12. Verificar compilación, restauración de sesión, navegación anónima, redirección de retorno, perfil inexistente o inactivo, errores de acceso y cierre de sesión en navegador.
@@ -98,7 +98,7 @@ La sesión serializada de Supabase se guardará bajo una clave de almacenamiento
 - **Sí:** autenticación exclusivamente por email y contraseña. Es el alcance funcional acordado.
 - **Sí:** persistencia en almacenamiento protegido del navegador. El SDK de Supabase C# no persiste sesiones por defecto y el usuario espera que sobrevivan recargas y visitas posteriores.
 - **Sí:** restaurar el estado solo después de que Blazor sea interactivo. El almacenamiento del navegador no está disponible durante el prerenderizado.
-- **Sí:** `AuthenticationStateProvider` y `AuthorizeRouteView`. Integran la sesión externa con la autorización de rutas durante la navegación interactiva de Blazor.
+- **Sí:** `AuthenticationStateProvider` y `AuthorizeView`. Integran la sesión externa con la autorización de rutas durante la navegación interactiva de Blazor sin requerir un esquema de autenticación HTTP de ASP.NET Core.
 - **Sí:** rutas funcionales protegidas y lista explícita de rutas públicas. Evita que una ruta nueva quede accesible por omisión.
 - **Sí:** volver a la ruta interna solicitada tras el login. Conserva la intención de navegación sin permitir redirecciones externas.
 - **Sí:** mensaje genérico para credenciales y mensaje temporal para red. Protege información de cuentas y permite distinguir problemas recuperables.
