@@ -11,6 +11,7 @@
 
 - Build: `dotnet build`
 - Run with the configured HTTPS profile: `dotnet run --launch-profile https` (HTTPS `https://localhost:7088`; HTTP `http://localhost:5138`).
+- If the agent starts the project with `dotnet run`, it must stop that process after verification and leave ports `7088` and `5138` free.
 - There is currently no test project, formatter, lint configuration, or CI workflow. Use `dotnet build` as the available verification baseline.
 
 ## Runtime
