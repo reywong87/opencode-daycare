@@ -1,6 +1,6 @@
 # SPEC 07 — Autenticación y protección de rutas
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 03, SPEC 08
 > **Date:** 2026-09-08
 > **Objective:** Integrar inicio de sesión por email y contraseña con Supabase, persistir la sesión y restringir las rutas funcionales a usuarios con un perfil activo.
@@ -73,23 +73,23 @@ La sesión serializada de Supabase se guardará bajo una clave de almacenamiento
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] Una cuenta existente de Supabase puede iniciar sesión desde `/login` usando solo email y contraseña.
-- [ ] El formulario muestra un estado no reenviable mientras la autenticación está en curso.
-- [ ] Credenciales rechazadas muestran un mensaje genérico que no revela si falló el email o la contraseña.
-- [ ] Un fallo temporal de red muestra un mensaje de error temporal distinto al de credenciales.
-- [ ] Una sesión autenticada con perfil `public.users` activo navega a la ruta de retorno interna solicitada o a `/` cuando no existe una ruta válida.
-- [ ] Un `returnUrl` externo, vacío o malformado nunca redirige fuera de la aplicación.
-- [ ] Una persona anónima que abre `/`, `/kids`, `/kids/{Slug}`, `/counter` o `/weather` termina en `/login` con la ruta original como retorno.
-- [ ] Una persona autenticada que abre `/login` no ve el formulario y navega al retorno válido o a `/`.
-- [ ] `/login`, `/activate-account`, `/not-found` y `/Error` permanecen accesibles sin sesión.
-- [ ] `/activate-account` y el enlace `Activa tu cuenta` siguen siendo visuales y no crean cuentas ni sesiones.
-- [ ] Tras recargar el navegador o abrir una nueva visita, una sesión válida se restaura y conserva el acceso a las rutas privadas.
-- [ ] Si la sesión restaurada no tiene perfil en `public.users` o su perfil no está `active`, se elimina la sesión y se bloquea el acceso a rutas privadas.
-- [ ] Un usuario autenticado puede leer el nombre de su propia guardería y no puede leer ninguna otra fila de `public.daycares`.
-- [ ] La barra lateral muestra el nombre completo, rol y guardería del perfil propio autenticado en vez de `Caro Giménez` y `Maestra · Soles`.
-- [ ] Pulsar `Cerrar sesión` revoca o cierra la sesión de Supabase, elimina la sesión almacenada y redirige a `/login`.
-- [ ] Tras cerrar sesión, abrir una ruta privada vuelve a redirigir a `/login`.
+- [x] `dotnet build` termina sin errores.
+- [x] Una cuenta existente de Supabase puede iniciar sesión desde `/login` usando solo email y contraseña.
+- [x] El formulario muestra un estado no reenviable mientras la autenticación está en curso.
+- [x] Credenciales rechazadas muestran un mensaje genérico que no revela si falló el email o la contraseña.
+- [x] Un fallo temporal de red muestra un mensaje de error temporal distinto al de credenciales.
+- [x] Una sesión autenticada con perfil `public.users` activo navega a la ruta de retorno interna solicitada o a `/` cuando no existe una ruta válida.
+- [x] Un `returnUrl` externo, vacío o malformado nunca redirige fuera de la aplicación.
+- [x] Una persona anónima que abre `/`, `/kids`, `/kids/{Slug}`, `/counter` o `/weather` termina en `/login` con la ruta original como retorno.
+- [x] Una persona autenticada que abre `/login` no ve el formulario y navega al retorno válido o a `/`.
+- [x] `/login`, `/activate-account`, `/not-found` y `/Error` permanecen accesibles sin sesión.
+- [x] `/activate-account` y el enlace `Activa tu cuenta` siguen siendo visuales y no crean cuentas ni sesiones.
+- [x] Tras recargar el navegador o abrir una nueva visita, una sesión válida se restaura y conserva el acceso a las rutas privadas.
+- [x] Si la sesión restaurada no tiene perfil en `public.users` o su perfil no está `active`, se elimina la sesión y se bloquea el acceso a rutas privadas.
+- [x] Un usuario autenticado puede leer el nombre de su propia guardería y no puede leer ninguna otra fila de `public.daycares`.
+- [x] La barra lateral muestra el nombre completo, rol y guardería del perfil propio autenticado en vez de `Caro Giménez` y `Maestra · Soles`.
+- [x] Pulsar `Cerrar sesión` revoca o cierra la sesión de Supabase, elimina la sesión almacenada y redirige a `/login`.
+- [x] Tras cerrar sesión, abrir una ruta privada vuelve a redirigir a `/login`.
 
 ## Decisions
 
