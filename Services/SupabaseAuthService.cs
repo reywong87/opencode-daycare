@@ -10,7 +10,8 @@ namespace OpenDaycare.Services;
 public sealed class SupabaseAuthService(
     Supabase.Client supabase,
     IDataProtectionProvider dataProtection,
-    IJSRuntime jsRuntime)
+    IJSRuntime jsRuntime,
+    ILogger<SupabaseAuthService> logger)
 {
     private const string SessionStorageKey = "opendaycare.auth.session.v1";
     private readonly IDataProtector sessionProtector = dataProtection.CreateProtector("OpenDaycare.Supabase.Session.v1");
@@ -92,33 +93,41 @@ public sealed class SupabaseAuthService(
             return null;
         }
 
-        var profileResponse = await supabase
-            .From<UserProfileRecord>()
-            .Filter("id", PostgrestConstants.Operator.Equals, currentUser.Id)
-            .Get();
-        var profile = profileResponse.Models.SingleOrDefault();
-        if (profile is null)
+        try
         {
-            return null;
-        }
-
-        string? daycareName = null;
-        if (profile.DaycareId is { } daycareId)
-        {
-            var daycareResponse = await supabase
-                .From<DaycareRecord>()
-                .Filter("id", PostgrestConstants.Operator.Equals, daycareId)
+            var profileResponse = await supabase
+                .From<UserProfileRecord>()
+                .Filter("id", PostgrestConstants.Operator.Equals, currentUser.Id)
                 .Get();
-            daycareName = daycareResponse.Models.SingleOrDefault()?.Name;
-        }
+            var profile = profileResponse.Models.SingleOrDefault();
+            if (profile is null)
+            {
+                return null;
+            }
 
-        return new AuthenticatedUser(
-            userId,
-            currentUser.Email ?? string.Empty,
-            profile.FullName,
-            profile.Role,
-            daycareName,
-            profile.Status);
+            string? daycareName = null;
+            if (profile.DaycareId is { } daycareId)
+            {
+                var daycareResponse = await supabase
+                    .From<DaycareRecord>()
+                    .Filter("id", PostgrestConstants.Operator.Equals, daycareId.ToString())
+                    .Get();
+                daycareName = daycareResponse.Models.SingleOrDefault()?.Name;
+            }
+
+            return new AuthenticatedUser(
+                userId,
+                currentUser.Email ?? string.Empty,
+                profile.FullName,
+                profile.Role,
+                daycareName,
+                profile.Status);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Unable to load the authenticated profile for user {UserId}.", userId);
+            throw;
+        }
     }
 
     private async Task PersistSessionAsync(Session session)

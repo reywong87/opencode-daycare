@@ -1,5 +1,6 @@
 @inject SupabaseAuthService AuthService
 @inject SupabaseAuthenticationStateProvider AuthenticationStateProvider
+@inject ILogger<AuthenticationInitializer> Logger
 
 @if (isInitialized)
 {
@@ -22,13 +23,22 @@ else
             return;
         }
 
-        var session = await AuthService.RestoreSessionAsync();
-        if (session is not null)
+        try
         {
-            await AuthenticationStateProvider.RefreshAuthenticationStateAsync();
+            var session = await AuthService.RestoreSessionAsync();
+            if (session is not null)
+            {
+                await AuthenticationStateProvider.RefreshAuthenticationStateAsync();
+            }
         }
-
-        isInitialized = true;
-        StateHasChanged();
+        catch (Exception exception)
+        {
+            Logger.LogWarning(exception, "Unable to restore the Supabase session.");
+        }
+        finally
+        {
+            isInitialized = true;
+            StateHasChanged();
+        }
     }
 }

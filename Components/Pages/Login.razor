@@ -2,7 +2,10 @@
 @layout AuthLayout
 @rendermode InteractiveServer
 @using System.ComponentModel.DataAnnotations
+@using Supabase.Gotrue.Exceptions
 @inject NavigationManager Navigation
+@inject SupabaseAuthService AuthService
+@inject SupabaseAuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Iniciar sesión | OpenDayCare</PageTitle>
 
@@ -52,7 +55,12 @@
                     <button type="button" class="cursor-pointer text-[13.5px] font-bold text-[#C5503A]">¿Olvidaste tu contraseña?</button>
                 </div>
 
-                <button type="submit" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">Iniciar sesión</button>
+                @if (!string.IsNullOrEmpty(loginError))
+                {
+                    <p class="mt-4 text-center text-[13px] font-semibold text-[#C5503A]" role="alert">@loginError</p>
+                }
+
+                <button type="submit" disabled="@isSubmitting" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:cursor-wait disabled:opacity-70">@(isSubmitting ? "Iniciando sesión..." : "Iniciar sesión")</button>
             </EditForm>
 
             <p class="mt-6 text-center text-[14.5px] text-[#94887B]">¿Te ha invitado la guardería? <a class="font-extrabold text-[#C5503A]" href="/activate-account" @onclick="NavigateToActivation" @onclick:preventDefault="true">Activa tu cuenta</a></p>
@@ -62,16 +70,95 @@
 
 @code {
     private readonly LoginForm login = new();
+    private bool isSubmitting;
+    private string? loginError;
 
-    private void HandleValidSubmit()
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    private string? returnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        Navigation.NavigateTo("/");
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authenticationState.User.Identity?.IsAuthenticated == true)
+        {
+            NavigateToReturnUrl();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSubmitting = true;
+        loginError = null;
+
+        try
+        {
+            bool signedIn;
+            try
+            {
+                signedIn = await AuthService.SignInAsync(login.Email, login.Password);
+            }
+            catch (HttpRequestException)
+            {
+                loginError = "No se pudo conectar. Inténtalo de nuevo en unos minutos.";
+                return;
+            }
+            catch (GotrueException)
+            {
+                loginError = "El email o la contraseña no son correctos.";
+                return;
+            }
+            catch
+            {
+                loginError = "No se pudo iniciar sesión. Inténtalo de nuevo en unos minutos.";
+                return;
+            }
+
+            if (!signedIn)
+            {
+                loginError = "El email o la contraseña no son correctos.";
+                return;
+            }
+
+            try
+            {
+                if (!await AuthenticationStateProvider.RefreshAuthenticationStateAsync())
+                {
+                    loginError = "No podemos acceder a tu cuenta en este momento.";
+                    return;
+                }
+
+                NavigateToReturnUrl();
+            }
+            catch (HttpRequestException)
+            {
+                loginError = "No se pudo cargar tu perfil. Inténtalo de nuevo en unos minutos.";
+            }
+            catch
+            {
+                loginError = "No se pudo cargar tu perfil. Inténtalo de nuevo en unos minutos.";
+            }
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
     }
 
     private void NavigateToActivation()
     {
         Navigation.NavigateTo("/activate-account");
     }
+
+    private void NavigateToReturnUrl()
+    {
+        Navigation.NavigateTo(IsValidReturnUrl(returnUrl) ? returnUrl! : "/", replace: true);
+    }
+
+    private static bool IsValidReturnUrl(string? candidate) =>
+        !string.IsNullOrWhiteSpace(candidate) &&
+        candidate.StartsWith('/') &&
+        !candidate.StartsWith("//") &&
+        !candidate.Contains('\\');
 
     private sealed class LoginForm
     {
