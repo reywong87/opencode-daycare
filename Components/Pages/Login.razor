@@ -102,6 +102,13 @@
                 loginError = "No se pudo conectar. Inténtalo de nuevo en unos minutos.";
                 return;
             }
+            catch (GotrueException exception)
+                when (exception.Reason == FailureHint.Reason.Offline ||
+                      exception.InnerException is HttpRequestException)
+            {
+                loginError = "No se pudo conectar. Inténtalo de nuevo en unos minutos.";
+                return;
+            }
             catch (GotrueException)
             {
                 loginError = "El email o la contraseña no son correctos.";
