@@ -1,3 +1,7 @@
+@using System.Security.Claims
+@inject SupabaseAuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
 <div class="contents">
     <input id="sidebar-menu" type="checkbox" class="peer sr-only" />
 
@@ -83,12 +87,12 @@
 
         <div class="mt-2.5 border-t border-[#ECE0D0] pt-3.5">
             <div class="flex items-center gap-[11px] px-2 py-1.5">
-                <Avatar Initials="C" BackgroundClass="bg-[#F2937A]" TextClass="text-white" SizeClass="size-[38px] text-base" />
+                <Avatar Initials="@Initials" BackgroundClass="bg-[#F2937A]" TextClass="text-white" SizeClass="size-[38px] text-base" />
                 <div class="min-w-0 flex-1">
-                    <p class="text-sm font-extrabold text-[#3F362E]">Caro Giménez</p>
-                    <p class="text-xs text-[#A89A8B]">Maestra · Soles</p>
+                    <p class="truncate text-sm font-extrabold text-[#3F362E]">@fullName</p>
+                    <p class="truncate text-xs text-[#A89A8B]">@role · @daycareName</p>
                 </div>
-                <button type="button" class="flex size-8 items-center justify-center rounded-[10px] bg-[#F6ECDF] text-[#94887B]" aria-label="Cerrar sesión">
+                <button type="button" disabled="@isSigningOut" class="flex size-8 items-center justify-center rounded-[10px] bg-[#F6ECDF] text-[#94887B] disabled:cursor-wait disabled:opacity-70" aria-label="Cerrar sesión" @onclick="SignOutAsync">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
                     </svg>
@@ -99,6 +103,40 @@
 </div>
 
 @code {
+    private string fullName = "";
+    private string role = "";
+    private string daycareName = "";
+    private bool isSigningOut;
+
     [Parameter]
     public EventCallback OnNewPost { get; set; }
+
+    private string Initials => string.Concat(fullName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+
+        fullName = user.Identity?.Name ?? "Usuario";
+        role = user.FindFirst(ClaimTypes.Role)?.Value ?? "Sin rol";
+        daycareName = user.FindFirst("daycare_name")?.Value ?? "Sin guardería";
+    }
+
+    private async Task SignOutAsync()
+    {
+        isSigningOut = true;
+
+        try
+        {
+            await AuthenticationStateProvider.SignOutAsync();
+        }
+        finally
+        {
+            Navigation.NavigateTo("/login", replace: true);
+        }
+    }
 }

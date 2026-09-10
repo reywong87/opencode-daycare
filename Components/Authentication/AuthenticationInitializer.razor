@@ -1,0 +1,44 @@
+@inject SupabaseAuthService AuthService
+@inject SupabaseAuthenticationStateProvider AuthenticationStateProvider
+@inject ILogger<AuthenticationInitializer> Logger
+
+@if (isInitialized)
+{
+    <Routes />
+}
+else
+{
+    <main class="flex min-h-screen items-center justify-center bg-[#FBF4EC] px-6 text-[#6E6359]" aria-live="polite">
+        <p class="text-sm font-semibold">Cargando OpenDayCare...</p>
+    </main>
+}
+
+@code {
+    private bool isInitialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            var session = await AuthService.RestoreSessionAsync();
+            if (session is not null)
+            {
+                await AuthenticationStateProvider.RefreshAuthenticationStateAsync();
+            }
+        }
+        catch (Exception exception)
+        {
+            Logger.LogWarning(exception, "Unable to restore the Supabase session.");
+        }
+        finally
+        {
+            isInitialized = true;
+            StateHasChanged();
+        }
+    }
+}
