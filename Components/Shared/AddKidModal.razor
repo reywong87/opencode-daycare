@@ -1,11 +1,14 @@
+@using OpenDaycare.Dtos
+@using OpenDaycare.Models
+
 @if (IsOpen)
 {
     <div @ref="modalOverlay" @onclick="HandleBackdropClickAsync" @onkeydown="HandleKeyDownAsync" tabindex="-1" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
         <section @onclick:stopPropagation="true" class="w-full max-w-[520px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="add-kid-title">
             <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
-                <button type="button" class="cursor-pointer text-[15px] font-bold text-[#94887B]" @onclick="HandleCancelAsync">Cancelar</button>
+                <button type="button" disabled="@isSaving" class="cursor-pointer text-[15px] font-bold text-[#94887B] disabled:cursor-not-allowed disabled:opacity-60" @onclick="HandleCancelAsync">Cancelar</button>
                 <h2 id="add-kid-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Agregar niño</h2>
-                <button type="button" class="cursor-pointer text-[15px] font-extrabold text-[#D9583C]" @onclick="HandleSaveAsync">Guardar</button>
+                <button type="button" disabled="@isSaving" class="cursor-pointer text-[15px] font-extrabold text-[#D9583C] disabled:cursor-not-allowed disabled:opacity-60" @onclick="HandleSaveAsync">@(isSaving ? "Guardando..." : "Guardar")</button>
             </header>
 
             <form class="space-y-[18px] px-[26px] py-6" novalidate>
@@ -31,10 +34,12 @@
                     <div>
                         <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-room">SALA</label>
                         <div class="relative">
-                            <select id="kid-room" @bind="draft.Room" class="w-full cursor-pointer appearance-none rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] pr-10 text-[15px] font-bold text-[#3F362E] outline-none focus:border-[#F2937A]">
-                                <option>Soles</option>
-                                <option>Estrellas</option>
-                                <option>Arcoíris</option>
+                            <select id="kid-room" disabled="@isSaving" @bind="draft.RoomId" class="w-full cursor-pointer appearance-none rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] pr-10 text-[15px] font-bold text-[#3F362E] outline-none focus:border-[#F2937A] disabled:cursor-not-allowed disabled:opacity-60">
+                                <option value="">Selecciona una sala</option>
+                                @foreach (var room in Rooms)
+                                {
+                                    <option value="@room.Id">@room.Name</option>
+                                }
                             </select>
                             <svg class="pointer-events-none absolute inset-y-0 right-4 my-auto size-4 text-[#B0A290]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m6 9 6 6 6-6" />
@@ -56,6 +61,11 @@
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-medical-notes">NOTAS MÉDICAS</label>
                     <textarea id="kid-medical-notes" placeholder="Indicaciones, medicación, contactos..." @bind="draft.MedicalNotes" @bind:event="oninput" class="min-h-[90px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] leading-6 text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
                 </div>
+
+                @if (saveError is not null)
+                {
+                    <p class="rounded-[12px] border border-[#E8B2A5] bg-[#FFF1ED] px-3 py-2 text-[13px] font-semibold text-[#C5503A]" role="alert">@saveError</p>
+                }
             </form>
         </section>
     </div>
@@ -69,15 +79,20 @@
     public EventCallback OnCancel { get; set; }
 
     [Parameter]
-    public EventCallback OnSave { get; set; }
+    public EventCallback<CreateChildRequest> OnSave { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<Room> Rooms { get; set; } = Array.Empty<Room>();
 
     private readonly AddKidDraft draft = new();
     private string? fullNameError;
     private string? birthDateError;
     private string? roomError;
+    private string? saveError;
     private ElementReference modalOverlay;
     private bool shouldFocusModal;
     private bool wasOpen;
+    private bool isSaving;
 
     protected override void OnParametersSet()
     {
@@ -100,27 +115,56 @@
 
     private async Task HandleSaveAsync()
     {
+        if (isSaving)
+        {
+            return;
+        }
+
+        var birthDate = draft.BirthDate;
+        var roomId = draft.RoomId;
         fullNameError = string.IsNullOrWhiteSpace(draft.FullName) ? "Introduce el nombre completo." : null;
-        birthDateError = draft.BirthDate switch
+        birthDateError = birthDate switch
         {
             null => "Introduce la fecha de nacimiento.",
             var date when date > DateOnly.FromDateTime(DateTime.Today) => "La fecha de nacimiento no puede ser futura.",
             _ => null
         };
-        roomError = string.IsNullOrWhiteSpace(draft.Room) ? "Selecciona una sala." : null;
+        roomError = roomId is null ? "Selecciona una sala." : null;
 
-        if (fullNameError is null && birthDateError is null && roomError is null)
+        if (fullNameError is not null || birthDateError is not null || roomError is not null || birthDate is null || roomId is null)
         {
-            await CloseAsync(OnSave);
+            return;
+        }
+
+        isSaving = true;
+        saveError = null;
+
+        try
+        {
+            await OnSave.InvokeAsync(new CreateChildRequest(
+                draft.FullName,
+                birthDate.Value,
+                roomId.Value,
+                draft.Allergies,
+                draft.MedicalNotes));
+            ResetDraft();
+        }
+        catch
+        {
+            saveError = "No se pudo guardar el niño. Inténtalo de nuevo.";
+        }
+        finally
+        {
+            isSaving = false;
         }
     }
 
     private Task HandleCancelAsync() => CloseAsync(OnCancel);
 
-    private Task HandleBackdropClickAsync() => CloseAsync(OnCancel);
+    private Task HandleBackdropClickAsync() => isSaving ? Task.CompletedTask : CloseAsync(OnCancel);
 
     private Task HandleKeyDownAsync(KeyboardEventArgs args) => args.Key == "Escape"
-        ? CloseAsync(OnCancel)
+        ? HandleBackdropClickAsync()
         : Task.CompletedTask;
 
     private async Task CloseAsync(EventCallback callback)
@@ -133,19 +177,20 @@
     {
         draft.FullName = string.Empty;
         draft.BirthDate = null;
-        draft.Room = "Soles";
+        draft.RoomId = null;
         draft.Allergies = string.Empty;
         draft.MedicalNotes = string.Empty;
         fullNameError = null;
         birthDateError = null;
         roomError = null;
+        saveError = null;
     }
 
     private sealed class AddKidDraft
     {
         public string FullName { get; set; } = string.Empty;
         public DateOnly? BirthDate { get; set; }
-        public string Room { get; set; } = "Soles";
+        public Guid? RoomId { get; set; }
         public string Allergies { get; set; } = string.Empty;
         public string MedicalNotes { get; set; } = string.Empty;
     }
