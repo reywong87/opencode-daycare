@@ -4,7 +4,7 @@ using Supabase.Postgrest.Models;
 namespace OpenDaycare.Models;
 
 [Table("daycares")]
-public sealed class DaycareRecord : BaseModel
+public sealed class Daycare : BaseModel
 {
     [PrimaryKey("id", false)]
     public Guid Id { get; set; }

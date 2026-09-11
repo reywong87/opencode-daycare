@@ -84,7 +84,7 @@ La carga de `/kids` usará un modelo de lectura con `Id`, `FullName`, `BirthDate
 
 1. Crear una migración imperativa en `supabase/migrations/` que defina `child_status`, `public.rooms` y `public.children`, sus restricciones, valores predeterminados, RLS y políticas de lectura e inserción para personal activo de la misma guardería.
 2. Añadir a la misma migración el sembrado transaccional de las tres salas para cada guardería existente y de los ocho niños demo en `Guardería Soles`; convertir cada mes de ingreso demo al primer día de ese mes.
-3. Crear `Models/RoomRecord.cs`, `Models/ChildRecord.cs` y `Models/CreateChildRequest.cs` con el mapeo de PostgREST y los datos requeridos para leer salas, crear niños y renderizar la lista.
+3. Crear `Models/Room.cs` y `Models/Child.cs` con el mapeo de PostgREST, y `Dtos/CreateChildRequest.cs` y `Dtos/ChildListItem.cs` para los contratos de alta y listado.
 4. Crear `Services/ChildrenService.cs` para cargar las salas autorizadas, cargar niños activos con su sala ordenados por nombre e insertar un niño en una sala autorizada; registrar detalles técnicos sin exponerlos en la interfaz.
 5. Registrar `ChildrenService` en `Program.cs` y verificar que el cliente Supabase conserva la sesión autenticada para que las políticas RLS se apliquen a sus operaciones.
 6. Actualizar `Components/Shared/AddKidModal.razor` para recibir las salas y un callback de guardado asíncrono, bloquear acciones duplicadas durante el envío, persistir el borrador válido y solo cerrarse después de una inserción correcta.
@@ -128,6 +128,7 @@ La carga de `/kids` usará un modelo de lectura con `Id`, `FullName`, `BirthDate
 - **Sí:** datos del listado exclusivamente desde Supabase. El catálogo estático no representa la fuente de verdad para `/kids`.
 - **Sí:** tarjetas no navegables. Los perfiles persistidos y sus relaciones requieren una segunda spec específica.
 - **Sí:** avatares derivados de UUID y nombre. Mantienen una apariencia estable sin almacenar imágenes o estilos por niño.
+- **Sí:** entidades PostgREST en `Models/` y contratos de aplicación en `Dtos/`. Separa las columnas de base de datos de los datos intercambiados entre servicio e interfaz.
 
 ## Risks
 
