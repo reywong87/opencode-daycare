@@ -44,6 +44,7 @@ public sealed class ChildrenService(
                 .Where(child => roomsById.TryGetValue(child.RoomId, out _))
                 .Select(child => new ChildListItem(
                     child.Id,
+                    child.Slug,
                     child.FullName,
                     child.BirthDate,
                     child.RoomId,
