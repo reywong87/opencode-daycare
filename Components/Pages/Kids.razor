@@ -2,6 +2,8 @@
 @rendermode InteractiveServer
 @using OpenDaycare.Components.Shared
 @using OpenDaycare.Dtos
+@using OpenDaycare.Models
+@inject ChildrenService ChildrenService
 
 <PageTitle>Niños | OpenDayCare</PageTitle>
 
@@ -27,32 +29,53 @@
         <input @bind="searchTerm" @bind:event="oninput" class="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B]" placeholder="Buscar niño…" aria-label="Buscar niño" />
     </div>
 
-    <div class="mb-3.5 flex items-center gap-3">
-        <span class="text-[12.5px] font-extrabold tracking-[0.8px] text-[#3F362E]">SALA SOLES</span>
-        <span class="text-[13px] text-[#A89A8B]">@FilteredKids.Count niños</span>
-        <span class="h-px flex-1 bg-[#E7DAC8]"></span>
-    </div>
-
-    @if (FilteredKids.Count == 0)
+    @if (FilteredChildren.Count == 0)
     {
         <p class="rounded-[18px] border border-dashed border-[#D8CBBA] bg-[#FFFDF9] px-5 py-8 text-center text-[15px] font-semibold text-[#94887B]">No se encontraron niños</p>
     }
     else
     {
-        <section class="grid gap-3.5 sm:grid-cols-2" aria-label="Niños de Sala Soles">
-            @foreach (var kid in FilteredKids)
-            {
-                <KidCard Kid="kid" />
-            }
-        </section>
+        @foreach (var room in rooms)
+        {
+            var roomChildren = FilteredChildren.Where(child => child.RoomId == room.Id).ToArray();
+
+            <div class="mb-3.5 flex items-center gap-3">
+                <span class="text-[12.5px] font-extrabold tracking-[0.8px] text-[#3F362E]">SALA @room.Name.ToUpperInvariant()</span>
+                <span class="text-[13px] text-[#A89A8B]">@roomChildren.Length niños</span>
+                <span class="h-px flex-1 bg-[#E7DAC8]"></span>
+            </div>
+
+            <section class="mb-7 grid gap-3.5 sm:grid-cols-2" aria-label="Niños de @room.Name">
+                @foreach (var child in roomChildren)
+                {
+                    <article class="rounded-[18px] border border-[#ECE0D0] bg-[#FFFDF9] p-5">
+                        <p class="text-[16px] font-extrabold text-[#3F362E]">@child.FullName</p>
+                        <p class="mt-1 text-[13px] text-[#94887B]">@child.BirthDate.ToString("d MMM yyyy")</p>
+                    </article>
+                }
+            </section>
+        }
     }
 </div>
 
-<AddKidModal IsOpen="isAddKidModalOpen" OnCancel="CloseAddKidModal" OnSave="HandleAddKidAsync" />
+<AddKidModal IsOpen="isAddKidModalOpen" Rooms="rooms" OnCancel="CloseAddKidModal" OnSave="HandleAddKidAsync" />
 
 @code {
     private string searchTerm = string.Empty;
+    private IReadOnlyList<Room> rooms = Array.Empty<Room>();
+    private IReadOnlyList<ChildListItem> children = Array.Empty<ChildListItem>();
     private bool isAddKidModalOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadKidsAsync();
+    }
+
+    private async Task LoadKidsAsync()
+    {
+        rooms = await ChildrenService.GetRoomsAsync();
+        children = await ChildrenService.GetActiveChildrenAsync();
+    }
 
     private void OpenAddKidModal()
     {
@@ -64,14 +87,14 @@
         isAddKidModalOpen = false;
     }
 
-    private Task HandleAddKidAsync(CreateChildRequest request)
+    private async Task HandleAddKidAsync(CreateChildRequest request)
     {
+        await ChildrenService.CreateChildAsync(request);
+        await LoadKidsAsync();
         CloseAddKidModal();
-        return Task.CompletedTask;
     }
 
-    private IReadOnlyList<Kid> FilteredKids => string.IsNullOrWhiteSpace(searchTerm)
-        ? KidCatalog.All
-        : KidCatalog.All.Where(kid => kid.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToArray();
-
+    private IReadOnlyList<ChildListItem> FilteredChildren => string.IsNullOrWhiteSpace(searchTerm)
+        ? children
+        : children.Where(child => child.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToArray();
 }
