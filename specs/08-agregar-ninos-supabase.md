@@ -1,6 +1,6 @@
 # SPEC 08 — Agregar niños con Supabase
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 04, SPEC 07
 > **Date:** 2026-09-10
 > **Objective:** Persistir niños desde `AddKidModal.razor` en Supabase y mostrar en `/kids` el listado real agrupado por sala para la guardería autorizada.
@@ -95,24 +95,24 @@ La carga de `/kids` usará un modelo de lectura con `Id`, `FullName`, `BirthDate
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] La migración crea `public.rooms`, `public.children` y el enum `child_status` con RLS habilitada.
-- [ ] La migración crea `Soles`, `Estrellas` y `Arcoíris` para cada guardería existente sin dejar resultados parciales si falla.
-- [ ] La migración inserta los ocho niños de `KidCatalog` solo en `Guardería Soles` y usa el primer día del mes indicado como `enrolled_at`.
-- [ ] Un perfil `active` con rol `staff` o `admin` solo puede leer salas y niños de su propia guardería.
-- [ ] Un perfil `active` con rol `staff` o `admin` solo puede insertar un niño en una sala de su propia guardería.
-- [ ] Un perfil `parent`, un perfil inactivo y un usuario de otra guardería no pueden leer ni insertar niños o salas mediante RLS.
-- [ ] `/kids` no usa `KidCatalog` para su listado, contador ni búsqueda.
-- [ ] `/kids` muestra únicamente niños con `status = active` cargados desde Supabase, agrupados por sala y ordenados alfabéticamente por nombre.
-- [ ] El selector de `AddKidModal.razor` muestra exclusivamente las salas de la guardería autorizada.
-- [ ] Guardar con nombre, fecha no futura y sala válidos inserta un niño con `enrolled_at` igual a la fecha local actual, `photo_consent = true` y `status = active`.
-- [ ] Si se rellenan alergias y notas, `medical_notes` contiene los bloques `Alergias:` y `Notas médicas:`; un bloque vacío no se guarda.
-- [ ] Se permiten niños activos con el mismo nombre y sala.
-- [ ] Tras una inserción correcta, el modal se cierra, se restablece y el nuevo niño aparece sin recargar el navegador en la sección de la sala elegida.
-- [ ] Si falla la inserción, el modal permanece abierto, conserva los campos y muestra un error general que permite volver a intentarlo.
-- [ ] Si falla cargar salas o niños, `/kids` muestra un error visible con una acción de reintento y no lo presenta como una lista vacía.
-- [ ] Cada tarjeta persistida muestra iniciales y un color consistente para el mismo UUID y no navega a `/kids/{slug}`.
-- [ ] A 1440px y 390px, el modal, los estados de carga/error y las secciones por sala son legibles y no producen desbordamiento horizontal.
+- [x] `dotnet build` termina sin errores.
+- [x] La migración crea `public.rooms`, `public.children` y el enum `child_status` con RLS habilitada.
+- [x] La migración crea `Soles`, `Estrellas` y `Arcoíris` para cada guardería existente sin dejar resultados parciales si falla.
+- [x] La migración inserta los ocho niños de `KidCatalog` solo en `Guardería Soles` y usa el primer día del mes indicado como `enrolled_at`.
+- [x] Un perfil `active` con rol `staff` o `admin` solo puede leer salas y niños de su propia guardería.
+- [x] Un perfil `active` con rol `staff` o `admin` solo puede insertar un niño en una sala de su propia guardería.
+- [x] Un perfil `parent`, un perfil inactivo y un usuario de otra guardería no pueden leer ni insertar niños o salas mediante RLS.
+- [x] `/kids` no usa `KidCatalog` para su listado, contador ni búsqueda.
+- [x] `/kids` muestra únicamente niños con `status = active` cargados desde Supabase, agrupados por sala y ordenados alfabéticamente por nombre.
+- [x] El selector de `AddKidModal.razor` muestra exclusivamente las salas de la guardería autorizada.
+- [x] Guardar con nombre, fecha no futura y sala válidos inserta un niño con `enrolled_at` igual a la fecha local actual, `photo_consent = true` y `status = active`.
+- [x] Si se rellenan alergias y notas, `medical_notes` contiene los bloques `Alergias:` y `Notas médicas:`; un bloque vacío no se guarda.
+- [x] Se permiten niños activos con el mismo nombre y sala.
+- [x] Tras una inserción correcta, el modal se cierra, se restablece y el nuevo niño aparece sin recargar el navegador en la sección de la sala elegida.
+- [x] Si falla la inserción, el modal permanece abierto, conserva los campos y muestra un error general que permite volver a intentarlo.
+- [x] Si falla cargar salas o niños, `/kids` muestra un error visible con una acción de reintento y no lo presenta como una lista vacía.
+- [x] Cada tarjeta persistida muestra iniciales y un color consistente para el mismo UUID y no navega a `/kids/{slug}`.
+- [x] A 1440px y 390px, el modal, los estados de carga/error y las secciones por sala son legibles y no producen desbordamiento horizontal.
 
 ## Decisions
 
