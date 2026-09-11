@@ -14,7 +14,7 @@
             <form class="space-y-[18px] px-[26px] py-6" novalidate>
                 <div>
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-full-name">NOMBRE COMPLETO</label>
-                    <input id="kid-full-name" type="text" autocomplete="name" placeholder="Ej. Martina López" @bind="draft.FullName" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <input id="kid-full-name" type="text" disabled="@isSaving" autocomplete="name" placeholder="Ej. Martina López" @bind="draft.FullName" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A] disabled:cursor-not-allowed disabled:opacity-60" />
                     @if (fullNameError is not null)
                     {
                         <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@fullNameError</p>
@@ -24,7 +24,7 @@
                 <div class="grid gap-[18px] sm:grid-cols-2 sm:gap-[14px]">
                     <div>
                         <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-birth-date">FECHA DE NACIMIENTO</label>
-                        <input id="kid-birth-date" type="date" @bind="draft.BirthDate" @bind:format="yyyy-MM-dd" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none focus:border-[#F2937A]" />
+                        <input id="kid-birth-date" type="date" disabled="@isSaving" @bind="draft.BirthDate" @bind:format="yyyy-MM-dd" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none focus:border-[#F2937A] disabled:cursor-not-allowed disabled:opacity-60" />
                         @if (birthDateError is not null)
                         {
                             <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@birthDateError</p>
@@ -54,12 +54,12 @@
 
                 <div>
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-allergies">ALERGIAS</label>
-                    <input id="kid-allergies" type="text" placeholder="Ej. Cacahuetes, lactosa" @bind="draft.Allergies" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                    <input id="kid-allergies" type="text" disabled="@isSaving" placeholder="Ej. Cacahuetes, lactosa" @bind="draft.Allergies" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A] disabled:cursor-not-allowed disabled:opacity-60" />
                 </div>
 
                 <div>
                     <label class="mb-2 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="kid-medical-notes">NOTAS MÉDICAS</label>
-                    <textarea id="kid-medical-notes" placeholder="Indicaciones, medicación, contactos..." @bind="draft.MedicalNotes" @bind:event="oninput" class="min-h-[90px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] leading-6 text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
+                    <textarea id="kid-medical-notes" disabled="@isSaving" placeholder="Indicaciones, medicación, contactos..." @bind="draft.MedicalNotes" @bind:event="oninput" class="min-h-[90px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] leading-6 text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A] disabled:cursor-not-allowed disabled:opacity-60"></textarea>
                 </div>
 
                 @if (saveError is not null)
