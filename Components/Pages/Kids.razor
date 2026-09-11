@@ -1,6 +1,9 @@
 @page "/kids"
 @rendermode InteractiveServer
 @using OpenDaycare.Components.Shared
+@using OpenDaycare.Dtos
+@using OpenDaycare.Models
+@inject ChildrenService ChildrenService
 
 <PageTitle>Niños | OpenDayCare</PageTitle>
 
@@ -10,7 +13,7 @@
             <p class="mb-1 text-[12.5px] font-extrabold tracking-[0.8px] text-[#D9583C]">GESTIÓN</p>
             <h1 class="font-fredoka text-[30px] font-semibold text-[#3F362E]">Niños</h1>
         </div>
-        <button type="button" class="flex cursor-pointer items-center gap-2 rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]" @onclick="OpenAddKidModal">
+        <button type="button" disabled="@isLoading" class="flex cursor-pointer items-center gap-2 rounded-[14px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)] disabled:cursor-not-allowed disabled:opacity-60" @onclick="OpenAddKidModal">
             <svg class="size-[17px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 5v14M5 12h14" />
             </svg>
@@ -23,35 +26,82 @@
             <circle cx="11" cy="11" r="7" />
             <path d="m21 21-4.3-4.3" />
         </svg>
-        <input @bind="searchTerm" @bind:event="oninput" class="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B]" placeholder="Buscar niño…" aria-label="Buscar niño" />
+        <input disabled="@isLoading" @bind="searchTerm" @bind:event="oninput" class="min-w-0 flex-1 border-0 bg-transparent text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] disabled:cursor-not-allowed disabled:opacity-60" placeholder="Buscar niño…" aria-label="Buscar niño" />
     </div>
 
-    <div class="mb-3.5 flex items-center gap-3">
-        <span class="text-[12.5px] font-extrabold tracking-[0.8px] text-[#3F362E]">SALA SOLES</span>
-        <span class="text-[13px] text-[#A89A8B]">@FilteredKids.Count niños</span>
-        <span class="h-px flex-1 bg-[#E7DAC8]"></span>
-    </div>
-
-    @if (FilteredKids.Count == 0)
+    @if (isLoading)
+    {
+        <p class="rounded-[18px] border border-[#ECE0D0] bg-[#FFFDF9] px-5 py-8 text-center text-[15px] font-semibold text-[#94887B]" role="status">Cargando niños...</p>
+    }
+    else if (loadError is not null)
+    {
+        <div class="rounded-[18px] border border-[#E8B2A5] bg-[#FFF1ED] px-5 py-6 text-center" role="alert">
+            <p class="text-[15px] font-semibold text-[#C5503A]">@loadError</p>
+            <button type="button" class="mt-4 cursor-pointer rounded-[12px] border border-[#D9583C] px-4 py-2 text-[13px] font-extrabold text-[#C5503A]" @onclick="LoadKidsAsync">Reintentar</button>
+        </div>
+    }
+    else if (FilteredChildren.Count == 0)
     {
         <p class="rounded-[18px] border border-dashed border-[#D8CBBA] bg-[#FFFDF9] px-5 py-8 text-center text-[15px] font-semibold text-[#94887B]">No se encontraron niños</p>
     }
     else
     {
-        <section class="grid gap-3.5 sm:grid-cols-2" aria-label="Niños de Sala Soles">
-            @foreach (var kid in FilteredKids)
-            {
-                <KidCard Kid="kid" />
-            }
-        </section>
+        @foreach (var room in rooms)
+        {
+            var roomChildren = FilteredChildren.Where(child => child.RoomId == room.Id).ToArray();
+
+            <div class="mb-3.5 flex items-center gap-3">
+                <span class="text-[12.5px] font-extrabold tracking-[0.8px] text-[#3F362E]">SALA @room.Name.ToUpperInvariant()</span>
+                <span class="text-[13px] text-[#A89A8B]">@roomChildren.Length niños</span>
+                <span class="h-px flex-1 bg-[#E7DAC8]"></span>
+            </div>
+
+            <section class="mb-7 grid gap-3.5 sm:grid-cols-2" aria-label="Niños de @room.Name">
+                @foreach (var child in roomChildren)
+                {
+                    <KidCard Child="child" />
+                }
+            </section>
+        }
     }
 </div>
 
-<AddKidModal IsOpen="isAddKidModalOpen" OnCancel="CloseAddKidModal" OnSave="CloseAddKidModal" />
+<AddKidModal IsOpen="isAddKidModalOpen" Rooms="rooms" OnCancel="CloseAddKidModal" OnSave="HandleAddKidAsync" />
 
 @code {
     private string searchTerm = string.Empty;
+    private IReadOnlyList<Room> rooms = Array.Empty<Room>();
+    private IReadOnlyList<ChildListItem> children = Array.Empty<ChildListItem>();
     private bool isAddKidModalOpen;
+    private bool isLoading = true;
+    private string? loadError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadKidsAsync();
+    }
+
+    private async Task LoadKidsAsync()
+    {
+        isLoading = true;
+        loadError = null;
+
+        try
+        {
+            rooms = await ChildrenService.GetRoomsAsync();
+            children = await ChildrenService.GetActiveChildrenAsync();
+        }
+        catch
+        {
+            rooms = Array.Empty<Room>();
+            children = Array.Empty<ChildListItem>();
+            loadError = "No se pudieron cargar los niños. Inténtalo de nuevo.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 
     private void OpenAddKidModal()
     {
@@ -63,8 +113,14 @@
         isAddKidModalOpen = false;
     }
 
-    private IReadOnlyList<Kid> FilteredKids => string.IsNullOrWhiteSpace(searchTerm)
-        ? KidCatalog.All
-        : KidCatalog.All.Where(kid => kid.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToArray();
+    private async Task HandleAddKidAsync(CreateChildRequest request)
+    {
+        await ChildrenService.CreateChildAsync(request);
+        await LoadKidsAsync();
+        CloseAddKidModal();
+    }
 
+    private IReadOnlyList<ChildListItem> FilteredChildren => string.IsNullOrWhiteSpace(searchTerm)
+        ? children
+        : children.Where(child => child.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToArray();
 }

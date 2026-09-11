@@ -96,7 +96,7 @@ public sealed class SupabaseAuthService(
         try
         {
             var profileResponse = await supabase
-                .From<UserProfileRecord>()
+                .From<UserProfile>()
                 .Filter("id", PostgrestConstants.Operator.Equals, currentUser.Id)
                 .Get();
             var profile = profileResponse.Models.SingleOrDefault();
@@ -109,7 +109,7 @@ public sealed class SupabaseAuthService(
             if (profile.DaycareId is { } daycareId)
             {
                 var daycareResponse = await supabase
-                    .From<DaycareRecord>()
+                    .From<Daycare>()
                     .Filter("id", PostgrestConstants.Operator.Equals, daycareId.ToString())
                     .Get();
                 daycareName = daycareResponse.Models.SingleOrDefault()?.Name;
