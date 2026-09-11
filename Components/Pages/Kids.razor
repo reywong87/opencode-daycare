@@ -48,10 +48,7 @@
             <section class="mb-7 grid gap-3.5 sm:grid-cols-2" aria-label="Niños de @room.Name">
                 @foreach (var child in roomChildren)
                 {
-                    <article class="rounded-[18px] border border-[#ECE0D0] bg-[#FFFDF9] p-5">
-                        <p class="text-[16px] font-extrabold text-[#3F362E]">@child.FullName</p>
-                        <p class="mt-1 text-[13px] text-[#94887B]">@child.BirthDate.ToString("d MMM yyyy")</p>
-                    </article>
+                    <KidCard Child="child" />
                 }
             </section>
         }
