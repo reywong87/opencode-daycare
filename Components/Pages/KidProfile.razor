@@ -1,6 +1,7 @@
 @page "/kids/{Slug}"
 @rendermode InteractiveServer
 @inject ChildrenService ChildrenService
+@inject NavigationManager Navigation
 @using System.Globalization
 @using OpenDaycare.Components.Shared
 @using OpenDaycare.Dtos
@@ -8,7 +9,26 @@
 
 <PageTitle>@(currentChild?.FullName ?? "Niño") | OpenDayCare</PageTitle>
 
-@if (currentChild is { } kid)
+@if (isLoading)
+{
+    <div class="mx-auto flex w-full max-w-[820px] items-center justify-center px-5 py-16 md:px-10 md:py-24" role="status" aria-live="polite">
+        <div class="flex items-center gap-3 rounded-2xl border border-[#ECE0D0] bg-[#FFFDF9] px-5 py-4 text-[15px] font-semibold text-[#8A7C6D] shadow-[0_4px_14px_-12px_rgba(120,90,60,0.5)]">
+            <span class="size-5 animate-spin rounded-full border-2 border-[#E8D8C7] border-t-[#D9583C]" aria-hidden="true"></span>
+            Cargando detalle...
+        </div>
+    </div>
+}
+else if (loadError is not null)
+{
+    <div class="mx-auto flex w-full max-w-[820px] items-center justify-center px-5 py-16 md:px-10 md:py-24">
+        <section class="w-full max-w-[520px] rounded-2xl border border-[#F2C7C0] bg-[#FFF8F6] p-5 text-center" role="alert">
+            <h1 class="font-fredoka text-[22px] font-semibold text-[#8F3E36]">No pudimos cargar el detalle</h1>
+            <p class="mt-2 text-[14.5px] leading-[1.5] text-[#A45B52]">@loadError</p>
+            <button type="button" class="mt-5 rounded-xl bg-[#3F362E] px-4 py-[10px] text-sm font-extrabold text-white" @onclick="RetryAsync">Reintentar</button>
+        </section>
+    </div>
+}
+else if (currentChild is { } kid)
 {
     <div class="mx-auto w-full max-w-[820px] px-5 py-8 md:px-10 md:pb-20 md:pt-[34px]">
         <a href="/kids" class="mb-5 flex items-center gap-[7px] text-sm font-bold text-[#94887B]">
@@ -92,10 +112,41 @@
 
     private ChildDetailItem? currentChild;
     private bool isLinkParentModalOpen;
+    private bool isLoading = true;
+    private string? loadError;
 
     protected override async Task OnParametersSetAsync()
     {
-        currentChild = await ChildrenService.GetActiveChildBySlugAsync(Slug);
+        await LoadChildAsync();
+    }
+
+    private async Task RetryAsync()
+    {
+        await LoadChildAsync();
+    }
+
+    private async Task LoadChildAsync()
+    {
+        isLoading = true;
+        loadError = null;
+        currentChild = null;
+
+        try
+        {
+            currentChild = await ChildrenService.GetActiveChildBySlugAsync(Slug);
+            if (currentChild is null)
+            {
+                Navigation.NavigateTo("/not-found", replace: true);
+            }
+        }
+        catch (Exception)
+        {
+            loadError = "Comprueba tu conexión e inténtalo de nuevo.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private void OpenLinkParentModal()
