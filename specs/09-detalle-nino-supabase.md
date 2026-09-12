@@ -1,6 +1,6 @@
 # SPEC 09 — Detalle de niño con Supabase
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 02, SPEC 05, SPEC 08
 > **Date:** 2026-09-11
 > **Objective:** Cargar y presentar el detalle de un niño persistido y autorizado desde Supabase mediante su slug único.
@@ -84,24 +84,24 @@ La edad se calculará en la interfaz a partir de `BirthDate` y la fecha local ac
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] La migración añade `children.slug` como columna `NOT NULL` y `UNIQUE` sin modificar políticas RLS.
-- [ ] La migración rellena cada slug existente con nombre y hasta dos apellidos normalizados, usa las palabras disponibles cuando faltan apellidos y añade un sufijo incremental si existe una colisión.
-- [ ] Crear un niño desde `/kids` persiste un slug único con el mismo formato.
-- [ ] Cada `KidCard` persistida de `/kids` navega a `/kids/{slug}` con el slug del niño.
-- [ ] La ruta `/kids/{Slug}` no consulta `KidCatalog`.
-- [ ] Un usuario autorizado ve el nombre, avatar, edad, sala, fecha de nacimiento, fecha de ingreso y notas médicas del niño activo solicitado.
-- [ ] La edad disminuye en un año hasta que llegue el aniversario de `BirthDate` en el año local actual.
-- [ ] Un niño sin `medical_notes` muestra `Sin alergias ni notas registradas`.
-- [ ] Un slug inexistente redirige a `/not-found`.
-- [ ] Un slug de niño archivado redirige a `/not-found`.
-- [ ] Un niño no visible por RLS redirige a `/not-found` sin revelar que pertenece a otra guardería.
-- [ ] Un fallo temporal de Supabase muestra un error visible y `Reintentar` vuelve a solicitar el mismo detalle.
-- [ ] El detalle muestra un estado de carga mientras la solicitud inicial está pendiente.
-- [ ] El detalle no muestra nombres, parentescos ni estados demo de padres.
-- [ ] El botón `Vincular otro padre` permanece visible y abre el modal visual existente.
-- [ ] `Editar` y `Resumen del día` siguen visibles y no ejecutan operaciones de persistencia.
-- [ ] A 1440px y 390px, el detalle, sus estados de carga/error y el modal de invitación son legibles y no producen desbordamiento horizontal.
+- [x] `dotnet build` termina sin errores.
+- [x] La migración añade `children.slug` como columna `NOT NULL` y `UNIQUE` sin modificar políticas RLS.
+- [x] La migración rellena cada slug existente con nombre y hasta dos apellidos normalizados, usa las palabras disponibles cuando faltan apellidos y añade un sufijo incremental si existe una colisión.
+- [x] Crear un niño desde `/kids` persiste un slug único con el mismo formato.
+- [x] Cada `KidCard` persistida de `/kids` navega a `/kids/{slug}` con el slug del niño.
+- [x] La ruta `/kids/{Slug}` no consulta `KidCatalog`.
+- [x] Un usuario autorizado ve el nombre, avatar, edad, sala, fecha de nacimiento, fecha de ingreso y notas médicas del niño activo solicitado.
+- [x] La edad disminuye en un año hasta que llegue el aniversario de `BirthDate` en el año local actual.
+- [x] Un niño sin `medical_notes` muestra `Sin alergias ni notas registradas`.
+- [x] Un slug inexistente redirige a `/not-found`.
+- [x] Un slug de niño archivado redirige a `/not-found`.
+- [x] Un niño no visible por RLS redirige a `/not-found` sin revelar que pertenece a otra guardería.
+- [x] Un fallo temporal de Supabase muestra un error visible y `Reintentar` vuelve a solicitar el mismo detalle.
+- [x] El detalle muestra un estado de carga mientras la solicitud inicial está pendiente.
+- [x] El detalle no muestra nombres, parentescos ni estados demo de padres.
+- [x] El botón `Vincular otro padre` permanece visible y abre el modal visual existente.
+- [x] `Editar` y `Resumen del día` siguen visibles y no ejecutan operaciones de persistencia.
+- [x] A 1440px y 390px, el detalle, sus estados de carga/error y el modal de invitación son legibles y no producen desbordamiento horizontal.
 
 ## Decisions
 
