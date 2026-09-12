@@ -1,12 +1,34 @@
 @page "/kids/{Slug}"
 @rendermode InteractiveServer
+@inject ChildrenService ChildrenService
 @inject NavigationManager Navigation
 @using System.Globalization
 @using OpenDaycare.Components.Shared
+@using OpenDaycare.Dtos
+@using OpenDaycare.Services
 
-<PageTitle>@(CurrentKid?.FullName ?? "Niño") | OpenDayCare</PageTitle>
+<PageTitle>@(currentChild?.FullName ?? "Niño") | OpenDayCare</PageTitle>
 
-@if (CurrentKid is { } kid)
+@if (isLoading)
+{
+    <div class="mx-auto flex w-full max-w-[820px] items-center justify-center px-5 py-16 md:px-10 md:py-24" role="status" aria-live="polite">
+        <div class="flex items-center gap-3 rounded-2xl border border-[#ECE0D0] bg-[#FFFDF9] px-5 py-4 text-[15px] font-semibold text-[#8A7C6D] shadow-[0_4px_14px_-12px_rgba(120,90,60,0.5)]">
+            <span class="size-5 animate-spin rounded-full border-2 border-[#E8D8C7] border-t-[#D9583C]" aria-hidden="true"></span>
+            Cargando detalle...
+        </div>
+    </div>
+}
+else if (loadError is not null)
+{
+    <div class="mx-auto flex w-full max-w-[820px] items-center justify-center px-5 py-16 md:px-10 md:py-24">
+        <section class="w-full max-w-[520px] rounded-2xl border border-[#F2C7C0] bg-[#FFF8F6] p-5 text-center" role="alert">
+            <h1 class="font-fredoka text-[22px] font-semibold text-[#8F3E36]">No pudimos cargar el detalle</h1>
+            <p class="mt-2 text-[14.5px] leading-[1.5] text-[#A45B52]">@loadError</p>
+            <button type="button" class="mt-5 rounded-xl bg-[#3F362E] px-4 py-[10px] text-sm font-extrabold text-white" @onclick="RetryAsync">Reintentar</button>
+        </section>
+    </div>
+}
+else if (currentChild is { } kid)
 {
     <div class="mx-auto w-full max-w-[820px] px-5 py-8 md:px-10 md:pb-20 md:pt-[34px]">
         <a href="/kids" class="mb-5 flex items-center gap-[7px] text-sm font-bold text-[#94887B]">
@@ -19,24 +41,24 @@
         <div class="grid gap-[26px] md:grid-cols-[minmax(0,1fr)_300px]">
             <div class="flex min-w-0 flex-col gap-[18px]">
                 <div class="flex flex-wrap items-center gap-[18px]">
-                    <Avatar Initials="@kid.Initials" BackgroundClass="@kid.AvatarBackgroundClass" TextClass="@kid.AvatarTextClass" SizeClass="size-[84px] text-[34px]" />
+                    <Avatar Initials="@GetInitials(kid.FullName)" BackgroundClass="@GetAvatarBackgroundClass(kid.Id)" TextClass="@GetAvatarTextClass(kid.Id)" SizeClass="size-[84px] text-[34px]" />
                     <div class="min-w-0 flex-1">
                         <h1 class="font-fredoka text-[28px] font-semibold text-[#3F362E]">@kid.FullName</h1>
-                        <p class="mt-[3px] text-[15px] text-[#94887B]">@kid.Age años · Sala @kid.Room</p>
+                        <p class="mt-[3px] text-[15px] text-[#94887B]">@GetAge(kid.BirthDate) años · Sala @kid.RoomName</p>
                     </div>
                     <button type="button" class="rounded-xl border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] px-4 py-[9px] text-sm font-bold text-[#6E6359]">Editar</button>
                 </div>
 
-                <section class="flex gap-3.5 rounded-2xl p-4 @(kid.Notes is null ? "bg-[#F4ECE1]" : "bg-[#FBDAD6]")" aria-labelledby="notes-title">
-                    <div class="flex size-10 shrink-0 items-center justify-center rounded-[11px] @(kid.Notes is null ? "bg-[#D8CBBA]" : "bg-[#F4A8A0]")">
+                <section class="flex gap-3.5 rounded-2xl p-4 @(kid.MedicalNotes is null ? "bg-[#F4ECE1]" : "bg-[#FBDAD6]")" aria-labelledby="notes-title">
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-[11px] @(kid.MedicalNotes is null ? "bg-[#D8CBBA]" : "bg-[#F4A8A0]")">
                         <svg class="size-[22px] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
                             <path d="M12 9v4M12 17h.01" />
                         </svg>
                     </div>
                     <div>
-                        <h2 id="notes-title" class="mb-0.5 text-[15px] font-extrabold @(kid.Notes is null ? "text-[#6E6359]" : "text-[#C5413A]")">Alergias y notas</h2>
-                        <p class="text-[14.5px] leading-[1.5] @(kid.Notes is null ? "text-[#8A7C6D]" : "text-[#B25249]")">@(kid.Notes ?? "Sin alergias ni notas registradas")</p>
+                        <h2 id="notes-title" class="mb-0.5 text-[15px] font-extrabold @(kid.MedicalNotes is null ? "text-[#6E6359]" : "text-[#C5413A]")">Alergias y notas</h2>
+                        <p class="text-[14.5px] leading-[1.5] @(kid.MedicalNotes is null ? "text-[#8A7C6D]" : "text-[#B25249]")">@(kid.MedicalNotes ?? "Sin alergias ni notas registradas")</p>
                     </div>
                 </section>
 
@@ -47,11 +69,11 @@
                     </div>
                     <div class="flex justify-between gap-4 border-b border-[#F0E6D8] px-[18px] py-[15px]">
                         <dt class="text-[14.5px] text-[#94887B]">Sala</dt>
-                        <dd class="text-right text-[14.5px] font-extrabold text-[#3F362E]">@kid.Room</dd>
+                        <dd class="text-right text-[14.5px] font-extrabold text-[#3F362E]">@kid.RoomName</dd>
                     </div>
                     <div class="flex justify-between gap-4 px-[18px] py-[15px]">
                         <dt class="text-[14.5px] text-[#94887B]">Ingreso</dt>
-                        <dd class="text-right text-[14.5px] font-extrabold text-[#3F362E]">@kid.EnrollmentLabel</dd>
+                        <dd class="text-right text-[14.5px] font-extrabold text-[#3F362E]">@kid.EnrolledAt.ToString("d MMM yyyy", CultureInfo.GetCultureInfo("es-AR"))</dd>
                     </div>
                 </dl>
             </div>
@@ -65,27 +87,8 @@
                     Resumen del día
                 </button>
 
-                <section class="rounded-2xl border border-[#ECE0D0] bg-[#FFFDF9] px-[18px] py-4" aria-labelledby="parents-title">
-                    <h2 id="parents-title" class="mb-3.5 text-[12.5px] font-extrabold tracking-[0.8px] text-[#8A7C6D]">PADRES VINCULADOS</h2>
+                <section class="rounded-2xl border border-[#ECE0D0] bg-[#FFFDF9] px-[18px] py-4">
                     <div class="flex flex-col gap-3.5">
-                        @if (kid.Parents.Count == 0)
-                        {
-                            <p class="text-[13px] text-[#A89A8B]">Sin padres vinculados</p>
-                        }
-                        else
-                        {
-                            @foreach (var parent in kid.Parents)
-                            {
-                                <div class="flex items-center gap-3">
-                                    <Avatar Initials="@parent.Initials" BackgroundClass="@parent.AvatarBackgroundClass" TextClass="text-white" SizeClass="size-10 text-base" />
-                                    <div class="min-w-0 flex-1">
-                                        <p class="truncate text-[14.5px] font-extrabold text-[#3F362E]">@parent.FullName</p>
-                                        <p class="text-[12.5px] text-[#A89A8B]">@parent.Relationship · @parent.InvitationStatus.ToLowerInvariant()</p>
-                                    </div>
-                                    <span class="shrink-0 rounded-full px-[9px] py-1 text-[10.5px] font-extrabold @parent.StatusBackgroundClass @parent.StatusTextClass">@parent.InvitationStatus.ToUpperInvariant()</span>
-                                </div>
-                            }
-                        }
                         <button type="button" class="flex items-center gap-3 pt-2 text-left" @onclick="OpenLinkParentModal">
                             <span class="flex size-10 shrink-0 items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-[#B0A290]">
                                 <svg class="size-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -105,10 +108,46 @@
 
 @code {
     [Parameter]
-    public string? Slug { get; set; }
+    public string Slug { get; set; } = string.Empty;
 
-    private Kid? CurrentKid => KidCatalog.FindBySlug(Slug);
+    private ChildDetailItem? currentChild;
     private bool isLinkParentModalOpen;
+    private bool isLoading = true;
+    private string? loadError;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadChildAsync();
+    }
+
+    private async Task RetryAsync()
+    {
+        await LoadChildAsync();
+    }
+
+    private async Task LoadChildAsync()
+    {
+        isLoading = true;
+        loadError = null;
+        currentChild = null;
+
+        try
+        {
+            currentChild = await ChildrenService.GetActiveChildBySlugAsync(Slug);
+            if (currentChild is null)
+            {
+                Navigation.NavigateTo("/not-found", replace: true);
+            }
+        }
+        catch (Exception)
+        {
+            loadError = "Comprueba tu conexión e inténtalo de nuevo.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 
     private void OpenLinkParentModal()
     {
@@ -120,11 +159,33 @@
         isLinkParentModalOpen = false;
     }
 
-    protected override void OnParametersSet()
+    private static int GetAge(DateOnly birthDate)
     {
-        if (CurrentKid is null)
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var age = today.Year - birthDate.Year;
+        if (today < birthDate.AddYears(age))
         {
-            Navigation.NavigateTo("/not-found", replace: true);
+            age--;
         }
+
+        return age;
     }
+
+    private static string GetInitials(string fullName) => string.Concat(fullName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
+
+    private static string GetAvatarBackgroundClass(Guid id) => AvatarColors[id.ToByteArray()[0] % AvatarColors.Length].BackgroundClass;
+
+    private static string GetAvatarTextClass(Guid id) => AvatarColors[id.ToByteArray()[0] % AvatarColors.Length].TextClass;
+
+    private static readonly (string BackgroundClass, string TextClass)[] AvatarColors =
+    [
+        ("bg-[#A9D9E8]", "text-[#1F7A93]"),
+        ("bg-[#F4B8CC]", "text-[#C44A7A]"),
+        ("bg-[#B9DEC4]", "text-[#3E8B62]"),
+        ("bg-[#F4DC8E]", "text-[#9A7B1E]"),
+        ("bg-[#C9B6E8]", "text-[#7B5FC0]")
+    ];
 }

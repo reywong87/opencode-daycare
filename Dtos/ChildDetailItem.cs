@@ -1,10 +1,9 @@
 namespace OpenDaycare.Dtos;
 
-public sealed record ChildListItem(
+public sealed record ChildDetailItem(
     Guid Id,
-    string Slug,
     string FullName,
     DateOnly BirthDate,
-    Guid RoomId,
+    DateOnly EnrolledAt,
     string RoomName,
     string? MedicalNotes);

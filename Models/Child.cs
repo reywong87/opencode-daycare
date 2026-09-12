@@ -15,6 +15,9 @@ public sealed class Child : BaseModel
     [Column("full_name")]
     public string FullName { get; set; } = string.Empty;
 
+    [Column("slug")]
+    public string Slug { get; set; } = string.Empty;
+
     [Column("birth_date")]
     public DateOnly BirthDate { get; set; }
 
