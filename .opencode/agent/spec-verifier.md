@@ -1,8 +1,6 @@
 ---
 description: Verifica, corrige y actualiza los criterios de aceptación de un archivo spec, usando Context7 para .NET y Blazor y Playwright para evidencia visual.
-mode: all
-model: openai/gpt-5.6-terra
-color: info
+mode: subagent
 permission:
   read: allow
   glob: allow
