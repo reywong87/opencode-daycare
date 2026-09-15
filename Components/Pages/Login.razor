@@ -39,28 +39,30 @@
 
             <EditForm Model="login" OnValidSubmit="HandleValidSubmit" class="mt-7" novalidate>
                 <DataAnnotationsValidator />
-                <div>
-                    <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-email">EMAIL</label>
-                    <input id="login-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" @bind="login.Email" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
-                    <ValidationMessage For="() => login.Email" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
-                </div>
+                <fieldset disabled="@isFormDisabled" aria-busy="@isSubmitting" class="m-0 min-w-0 border-0 p-0">
+                    <div>
+                        <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-email">EMAIL</label>
+                        <InputText id="login-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" @bind-Value="login.Email" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                        <ValidationMessage For="() => login.Email" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
+                    </div>
 
-                <div class="mt-[18px]">
-                    <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-password">CONTRASEÑA</label>
-                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" @bind="login.Password" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
-                    <ValidationMessage For="() => login.Password" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
-                </div>
+                    <div class="mt-[18px]">
+                        <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-password">CONTRASEÑA</label>
+                        <InputText id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" @bind-Value="login.Password" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
+                        <ValidationMessage For="() => login.Password" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
+                    </div>
 
-                <div class="mt-2.5 text-right">
-                    <button type="button" class="cursor-pointer text-[13.5px] font-bold text-[#C5503A]">¿Olvidaste tu contraseña?</button>
-                </div>
+                    <div class="mt-2.5 text-right">
+                        <button type="button" class="cursor-pointer text-[13.5px] font-bold text-[#C5503A]">¿Olvidaste tu contraseña?</button>
+                    </div>
 
-                @if (!string.IsNullOrEmpty(loginError))
-                {
-                    <p class="mt-4 text-center text-[13px] font-semibold text-[#C5503A]" role="alert">@loginError</p>
-                }
+                    @if (!string.IsNullOrEmpty(loginError))
+                    {
+                        <p class="mt-4 text-center text-[13px] font-semibold text-[#C5503A]" role="alert">@loginError</p>
+                    }
 
-                <button type="submit" disabled="@isSubmitting" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:cursor-wait disabled:opacity-70">@(isSubmitting ? "Iniciando sesión..." : "Iniciar sesión")</button>
+                    <button type="submit" disabled="@isSubmitting" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:cursor-wait disabled:opacity-70">@(isSubmitting ? "Iniciando sesión..." : "Iniciar sesión")</button>
+                </fieldset>
             </EditForm>
 
             <p class="mt-6 text-center text-[14.5px] text-[#94887B]">¿Te ha invitado la guardería? <a class="font-extrabold text-[#C5503A]" href="/activate-account" @onclick="NavigateToActivation" @onclick:preventDefault="true">Activa tu cuenta</a></p>
@@ -70,6 +72,7 @@
 
 @code {
     private readonly LoginForm login = new();
+    private bool isFormDisabled = true;
     private bool isSubmitting;
     private string? loginError;
 
@@ -78,6 +81,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        isFormDisabled = !RendererInfo.IsInteractive;
+
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authenticationState.User.Identity?.IsAuthenticated == true)
         {
@@ -87,6 +92,11 @@
 
     private async Task HandleValidSubmit()
     {
+        if (isSubmitting)
+        {
+            return;
+        }
+
         isSubmitting = true;
         loginError = null;
 

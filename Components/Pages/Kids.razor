@@ -4,6 +4,7 @@
 @using OpenDaycare.Dtos
 @using OpenDaycare.Models
 @inject ChildrenService ChildrenService
+@inject ILogger<Kids> Logger
 
 <PageTitle>Niños | OpenDayCare</PageTitle>
 
@@ -59,7 +60,7 @@
             <section class="mb-7 grid gap-3.5 sm:grid-cols-2" aria-label="Niños de @room.Name">
                 @foreach (var child in roomChildren)
                 {
-                    <KidCard Child="child" />
+                    <KidCard @key="child" Child="child" />
                 }
             </section>
         }
@@ -91,8 +92,9 @@
             rooms = await ChildrenService.GetRoomsAsync();
             children = await ChildrenService.GetActiveChildrenAsync();
         }
-        catch
+        catch (Exception exception)
         {
+            Logger.LogError(exception, "Failed to load rooms and active children.");
             rooms = Array.Empty<Room>();
             children = Array.Empty<ChildListItem>();
             loadError = "No se pudieron cargar los niños. Inténtalo de nuevo.";
