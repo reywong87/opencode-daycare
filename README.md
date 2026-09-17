@@ -35,6 +35,23 @@ dotnet build
 dotnet run --launch-profile https
 ```
 
+## MCP de Supabase
+
+El servidor MCP remoto de Supabase se autentica mediante OAuth en el navegador; no requiere un Personal Access Token (PAT). Configura el servidor en OpenCode con el endpoint remoto:
+
+```json
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp"
+    }
+  }
+}
+```
+
+Al usar una herramienta de Supabase por primera vez, OpenCode iniciará el flujo de autorización. Inicia sesión con la cuenta de Supabase que tenga acceso al proyecto, aprueba los permisos solicitados y recarga la sesión de OpenCode si las herramientas no aparecen.
+
 ## Estructura
 
 ```text

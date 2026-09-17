@@ -44,4 +44,10 @@
 - `spec-impl`: implementa una especificación aprobada; valida su estado, crea una rama con el nombre del spec y avanza por pasos revisando los cambios.
 - `supabase`: úsala para cualquier tarea relacionada con Supabase, incluidos Database, Auth, Edge Functions, Realtime, Storage, CLI, MCP, RLS, migraciones y diagnóstico. Antes de implementar, revisa el changelog y la documentación actual; verifica las correcciones mediante una consulta o prueba.
 - `supabase-postgres-best-practices`: cárgala antes de crear o modificar cualquier elemento de Postgres, incluidas tablas, columnas, migraciones, políticas RLS, índices, triggers, funciones, trabajos programados o SQL. También úsala para diagnosticar rendimiento, bloqueos, agotamiento de conexiones o exposición incorrecta de filas.
-- El subagente `spec-verifier` verifica, corrige y actualiza los criterios de aceptación de un spec. Para criterios de .NET o Blazor consulta Context7 y, para criterios de interfaz, usa Playwright y guarda los artefactos en `.playwright-mcp/`.
+
+## Subagentes
+
+- `accessibility-checker`: audita archivos y flujos de interfaz contra WCAG 2.2 AA en modo de solo lectura. Informa problemas, mejoras propuestas y validaciones manuales pendientes; el agente Build aplica los cambios.
+- `blazor-best-practices`: revisa y corrige buenas prácticas de Blazor y ASP.NET Core únicamente en los archivos indicados. Consulta Context7 antes de evaluar APIs o patrones dependientes del framework y ejecuta la verificación pertinente tras los cambios.
+- `db-migrator`: crea y aplica exclusivamente migraciones de Supabase solicitadas de forma explícita. Debe preservar los historiales local y remoto, usar las skills `supabase` y `supabase-postgres-best-practices`, y verificar el resultado y los asesores después de cambios de esquema.
+- `spec-verifier`: verifica, corrige y actualiza los checks de criterios de aceptación de un spec. Para criterios de .NET o Blazor consulta Context7 y, para criterios de interfaz, usa Playwright y guarda los artefactos en `.playwright-mcp/`.

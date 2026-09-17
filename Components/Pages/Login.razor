@@ -10,7 +10,7 @@
 <PageTitle>Iniciar sesión | OpenDayCare</PageTitle>
 
 <div class="min-h-screen bg-[#FBF4EC] lg:grid lg:grid-cols-[1.05fr_1fr]">
-    <section class="relative hidden overflow-hidden bg-[linear-gradient(155deg,#F6A98E_0%,#F2937A_45%,#EC7E62_100%)] px-[60px] py-14 text-white lg:flex lg:flex-col lg:justify-between">
+    <aside aria-label="Acerca de OpenDayCare" class="relative hidden overflow-hidden bg-linear-155 from-[#C5503A] via-[#C04B37] to-[#B74733] px-[60px] py-14 text-white lg:flex lg:flex-col lg:justify-between">
         <div class="absolute -right-[120px] -top-[140px] size-[420px] rounded-full bg-white/12"></div>
         <div class="absolute -bottom-[110px] -left-20 size-[300px] rounded-full bg-white/10"></div>
 
@@ -25,51 +25,54 @@
         </div>
 
         <div class="relative">
-            <h1 class="font-fredoka text-[42px] leading-[1.12] font-semibold focus:outline-none">El día de cada niño,<br />compartido con su familia.</h1>
-            <p class="mt-[18px] max-w-[430px] text-[17px] leading-[1.6] text-white/92">Publica momentos, gestiona las salas y mantén a las familias cerca, desde un solo lugar.</p>
+            <p class="font-fredoka text-[42px] leading-[1.12] font-semibold">El día de cada niño,<br />compartido con su familia.</p>
+            <p class="mt-[18px] max-w-[430px] text-[17px] leading-[1.6]">Publica momentos, gestiona las salas y mantén a las familias cerca, desde un solo lugar.</p>
         </div>
 
-        <p class="relative text-sm text-white/90">🌿 Guardería Sala Soles</p>
-    </section>
+        <p class="relative text-sm">🌿 Guardería Sala Soles</p>
+    </aside>
 
-    <section class="flex min-h-screen items-center justify-center px-10 py-10">
+    <section aria-labelledby="login-title" class="flex min-h-screen items-center justify-center px-10 py-10">
         <div class="w-full max-w-[392px]">
-            <h1 class="font-fredoka text-[30px] font-semibold text-[#3F362E] focus:outline-none">Iniciar sesión</h1>
-            <p class="mt-1.5 text-[15px] text-[#94887B]">Inicia sesión para ver el día de hoy.</p>
+            <h1 id="login-title" class="font-fredoka text-[30px] font-semibold text-[#3F362E]">Iniciar sesión</h1>
+            <p class="mt-1.5 text-[15px] text-[#74675B]">Inicia sesión para ver el día de hoy.</p>
 
             <EditForm Model="login" OnValidSubmit="HandleValidSubmit" class="mt-7" novalidate>
                 <DataAnnotationsValidator />
-                <div>
-                    <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-email">EMAIL</label>
-                    <input id="login-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" @bind="login.Email" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
-                    <ValidationMessage For="() => login.Email" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
-                </div>
+                <fieldset disabled="@isFormDisabled" aria-busy="@isSubmitting" class="m-0 min-w-0 border-0 p-0">
+                    <div>
+                        <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#74675B]" for="login-email">EMAIL</label>
+                        <InputText id="login-email" name="email" type="email" autocomplete="email" placeholder="tu@email.com" required="true" aria-required="true" aria-describedby="login-email-error" @bind-Value="login.Email" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus-visible:border-[#B74733] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3F362E]" />
+                        <ValidationMessage For="() => login.Email" id="login-email-error" role="alert" class="mt-1.5 block text-[13px] font-semibold text-[#B74733]" />
+                    </div>
 
-                <div class="mt-[18px]">
-                    <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#94887B]" for="login-password">CONTRASEÑA</label>
-                    <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" @bind="login.Password" @bind:event="oninput" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]" />
-                    <ValidationMessage For="() => login.Password" class="mt-1.5 block text-[13px] font-semibold text-[#C5503A]" />
-                </div>
+                    <div class="mt-[18px]">
+                        <label class="mb-2 block text-xs font-bold tracking-[0.7px] text-[#74675B]" for="login-password">CONTRASEÑA</label>
+                        <InputText id="login-password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required="true" aria-required="true" aria-describedby="login-password-error" @bind-Value="login.Password" class="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus-visible:border-[#B74733] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3F362E]" />
+                        <ValidationMessage For="() => login.Password" id="login-password-error" role="alert" class="mt-1.5 block text-[13px] font-semibold text-[#B74733]" />
+                    </div>
 
-                <div class="mt-2.5 text-right">
-                    <button type="button" class="cursor-pointer text-[13.5px] font-bold text-[#C5503A]">¿Olvidaste tu contraseña?</button>
-                </div>
+                    <div class="mt-2.5 text-right">
+                        <button type="button" class="min-h-6 cursor-pointer px-1 text-[13.5px] font-bold text-[#B74733] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3F362E]">¿Olvidaste tu contraseña?</button>
+                    </div>
 
-                @if (!string.IsNullOrEmpty(loginError))
-                {
-                    <p class="mt-4 text-center text-[13px] font-semibold text-[#C5503A]" role="alert">@loginError</p>
-                }
+                    @if (!string.IsNullOrEmpty(loginError))
+                    {
+                        <p class="mt-4 text-center text-[13px] font-semibold text-[#B74733]" role="alert">@loginError</p>
+                    }
 
-                <button type="submit" disabled="@isSubmitting" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#F4977E] to-[#EE8164] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:cursor-wait disabled:opacity-70">@(isSubmitting ? "Iniciando sesión..." : "Iniciar sesión")</button>
+                    <button type="submit" disabled="@isSubmitting" class="mt-5 w-full cursor-pointer rounded-[15px] bg-linear-to-b from-[#C5503A] to-[#B74733] px-4 py-[15px] text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(183,71,51,0.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3F362E] disabled:cursor-wait disabled:opacity-70">@(isSubmitting ? "Iniciando sesión..." : "Iniciar sesión")</button>
+                </fieldset>
             </EditForm>
 
-            <p class="mt-6 text-center text-[14.5px] text-[#94887B]">¿Te ha invitado la guardería? <a class="font-extrabold text-[#C5503A]" href="/activate-account" @onclick="NavigateToActivation" @onclick:preventDefault="true">Activa tu cuenta</a></p>
+            <p class="mt-6 text-center text-[14.5px] text-[#74675B]">¿Te ha invitado la guardería? <a class="font-extrabold text-[#B74733] underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3F362E]" href="/activate-account" @onclick="NavigateToActivation" @onclick:preventDefault="true">Activa tu cuenta</a></p>
         </div>
     </section>
 </div>
 
 @code {
     private readonly LoginForm login = new();
+    private bool isFormDisabled = true;
     private bool isSubmitting;
     private string? loginError;
 
@@ -78,6 +81,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        isFormDisabled = !RendererInfo.IsInteractive;
+
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (authenticationState.User.Identity?.IsAuthenticated == true)
         {
@@ -87,6 +92,11 @@
 
     private async Task HandleValidSubmit()
     {
+        if (isSubmitting)
+        {
+            return;
+        }
+
         isSubmitting = true;
         loginError = null;
 
