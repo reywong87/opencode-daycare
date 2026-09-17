@@ -237,4 +237,103 @@ using (
     )
 );
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+    'post-images',
+    'post-images',
+    false,
+    5242880,
+    array['image/jpeg', 'image/png', 'image/webp']::text[]
+);
+
+create policy "Active daycare users can read post images"
+on storage.objects
+for select
+to authenticated
+using (
+    bucket_id = 'post-images'
+    and name ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|jpeg|png|webp)$'
+    and exists (
+        select 1
+        from public.posts
+        join public.users on users.daycare_id = posts.daycare_id
+        where posts.id::text = split_part(storage.objects.name, '/', 2)
+          and posts.daycare_id::text = split_part(storage.objects.name, '/', 1)
+          and users.id = (select auth.uid())
+          and users.status = 'active'
+          and users.role in ('staff', 'admin', 'parent')
+    )
+);
+
+create policy "Post authors can insert post images"
+on storage.objects
+for insert
+to authenticated
+with check (
+    bucket_id = 'post-images'
+    and name ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|jpeg|png|webp)$'
+    and exists (
+        select 1
+        from public.posts
+        join public.users on users.id = posts.author_id
+        where posts.id::text = split_part(storage.objects.name, '/', 2)
+          and posts.daycare_id::text = split_part(storage.objects.name, '/', 1)
+          and posts.author_id = (select auth.uid())
+          and users.status = 'active'
+          and users.role in ('staff', 'admin')
+    )
+);
+
+create policy "Post authors can update post images"
+on storage.objects
+for update
+to authenticated
+using (
+    bucket_id = 'post-images'
+    and name ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|jpeg|png|webp)$'
+    and exists (
+        select 1
+        from public.posts
+        join public.users on users.id = posts.author_id
+        where posts.id::text = split_part(storage.objects.name, '/', 2)
+          and posts.daycare_id::text = split_part(storage.objects.name, '/', 1)
+          and posts.author_id = (select auth.uid())
+          and users.status = 'active'
+          and users.role in ('staff', 'admin')
+    )
+)
+with check (
+    bucket_id = 'post-images'
+    and name ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|jpeg|png|webp)$'
+    and exists (
+        select 1
+        from public.posts
+        join public.users on users.id = posts.author_id
+        where posts.id::text = split_part(storage.objects.name, '/', 2)
+          and posts.daycare_id::text = split_part(storage.objects.name, '/', 1)
+          and posts.author_id = (select auth.uid())
+          and users.status = 'active'
+          and users.role in ('staff', 'admin')
+    )
+);
+
+create policy "Post authors can delete post images"
+on storage.objects
+for delete
+to authenticated
+using (
+    bucket_id = 'post-images'
+    and name ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(jpg|jpeg|png|webp)$'
+    and exists (
+        select 1
+        from public.posts
+        join public.users on users.id = posts.author_id
+        where posts.id::text = split_part(storage.objects.name, '/', 2)
+          and posts.daycare_id::text = split_part(storage.objects.name, '/', 1)
+          and posts.author_id = (select auth.uid())
+          and users.status = 'active'
+          and users.role in ('staff', 'admin')
+    )
+);
+
 commit;
