@@ -1,32 +1,19 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using OpenDaycare.Dtos
+@using OpenDaycare.Services
+@inject PostService PostService
+
 @if (IsOpen)
 {
     <div @ref="modalOverlay" @onclick="HandleBackdropClickAsync" @onkeydown="HandleKeyDownAsync" tabindex="-1" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
         <section @onclick:stopPropagation="true" class="w-full max-w-[580px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="create-post-title">
             <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
-                <button type="button" class="text-[15px] font-bold text-[#94887B]" @onclick="HandleCancelAsync">Cancelar</button>
+                <button type="button" class="text-[15px] font-bold text-[#94887B]" @onclick="HandleCancelAsync" disabled="@isSubmitting">Cancelar</button>
                 <h2 id="create-post-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Nueva publicación</h2>
-                <button type="button" class="text-[15px] font-extrabold text-[#D9583C]" @onclick="HandlePublish">Publicar</button>
+                <button type="button" class="text-[15px] font-extrabold text-[#D9583C] disabled:cursor-not-allowed disabled:opacity-50" disabled="@isSubmitting" @onclick="HandlePublish">@(isSubmitting ? "Publicando…" : "Publicar")</button>
             </header>
 
             <form class="px-[26px] py-6" novalidate @onsubmit:preventDefault="true">
-                <fieldset class="mb-[22px]">
-                    <legend class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">PARA</legend>
-                    <div class="flex flex-wrap gap-[9px]">
-                        @foreach (var kid in KidCatalog.All)
-                        {
-                            <button type="button" aria-pressed="@draft.SelectedKidSlugs.Contains(kid.Slug)" class="@GetKidChipClass(kid.Slug)" @onclick="() => ToggleKid(kid.Slug)">
-                                <span class="flex size-[26px] items-center justify-center rounded-full font-fredoka text-[13px] font-semibold @kid.AvatarBackgroundClass @kid.AvatarTextClass">@kid.Initials</span>
-                                @kid.FullName
-                            </button>
-                        }
-                        <button type="button" aria-pressed="@draft.IsRoomSelected" class="@GetRoomChipClass()" @onclick="ToggleRoom">Toda la sala</button>
-                    </div>
-                    @if (recipientError is not null)
-                    {
-                        <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@recipientError</p>
-                    }
-                </fieldset>
-
                 <fieldset class="mb-[22px]">
                     <legend class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">TIPO</legend>
                     <div class="flex flex-wrap gap-[9px]">
@@ -39,7 +26,8 @@
 
                 <div class="mb-[22px]">
                     <label class="mb-2.5 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="post-description">DESCRIPCIÓN</label>
-                    <textarea id="post-description" placeholder="Cuenta cómo le fue hoy…" @bind="draft.Description" @bind:event="oninput" class="min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[14px] text-[15px] leading-[1.5] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
+                    <textarea id="post-description" maxlength="1000" placeholder="Cuenta cómo le fue hoy…" @bind="draft.Description" @bind:event="oninput" class="min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[14px] text-[15px] leading-[1.5] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
+                    <p class="mt-1 text-right text-xs text-[#94887B]">@draft.Description.Length/1000</p>
                     @if (descriptionError is not null)
                     {
                         <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@descriptionError</p>
@@ -48,22 +36,35 @@
 
                 <section aria-labelledby="post-photos-title">
                     <h3 id="post-photos-title" class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">FOTOS</h3>
-                    <div class="flex gap-3">
-                        <div class="flex size-24 items-center justify-center rounded-[14px] border border-[#ECE0D0] bg-[#F4ECE1] text-[#CBB89F]" aria-label="Vista previa de foto">
-                            <svg class="size-[26px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <rect x="3" y="3" width="18" height="18" rx="2" />
-                                <circle cx="9" cy="9" r="2" />
-                                <path d="m21 15-3.6-3.6a2 2 0 0 0-2.8 0L6 21" />
-                            </svg>
-                        </div>
-                        <div class="flex size-24 flex-col items-center justify-center gap-1.5 rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]" aria-label="Agregar foto">
-                            <svg class="size-[22px] text-[#C5503A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M12 5v14M5 12h14" />
-                            </svg>
-                            <span class="text-xs">Agregar</span>
-                        </div>
+                    <div class="flex flex-wrap gap-3">
+                        @foreach (var photo in selectedPhotos)
+                        {
+                            <div class="relative size-24 overflow-hidden rounded-[14px] border border-[#ECE0D0] bg-[#F4ECE1]" title="@photo.File.Name">
+                                <img src="@photo.PreviewUrl" alt="Vista previa de @photo.File.Name" class="size-full object-cover" />
+                                <button type="button" class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-full bg-[#3F362E]/80 text-sm font-bold text-white" aria-label="Quitar @photo.File.Name" @onclick="() => RemovePhoto(photo)">×</button>
+                            </div>
+                        }
+                        @if (selectedPhotos.Count < MaxPhotoCount)
+                        {
+                            <label class="flex size-24 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]" aria-label="Agregar foto">
+                                <svg class="size-[22px] text-[#C5503A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 5v14M5 12h14" />
+                                </svg>
+                                <span class="text-xs">Agregar</span>
+                                <InputFile OnChange="HandleFilesSelected" accept="image/jpeg,image/png,image/webp" multiple class="sr-only" />
+                            </label>
+                        }
                     </div>
+                    @if (photoError is not null)
+                    {
+                        <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@photoError</p>
+                    }
                 </section>
+
+                @if (persistenceError is not null)
+                {
+                    <p role="alert" class="mt-4 rounded-[12px] bg-[#FBE2DC] px-3 py-2 text-[13px] font-semibold text-[#C5503A]">@persistenceError</p>
+                }
             </form>
         </section>
     </div>
@@ -79,13 +80,33 @@
     [Parameter]
     public EventCallback OnSave { get; set; }
 
+    private const int MaxPhotoCount = 5;
+    private const long MaxPhotoSize = 5 * 1024 * 1024;
     private static readonly string[] PostKinds = ["Comida", "Siesta", "Actividad", "Logro", "Ánimo", "Foto", "Anuncio"];
+    private static readonly IReadOnlyDictionary<string, string> PostTypeValues = new Dictionary<string, string>
+    {
+        ["Comida"] = "meal",
+        ["Siesta"] = "nap",
+        ["Actividad"] = "activity",
+        ["Logro"] = "achievement",
+        ["Ánimo"] = "mood",
+        ["Foto"] = "photo",
+        ["Anuncio"] = "announcement"
+    };
+    private static readonly IReadOnlySet<string> AllowedContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg", "image/png", "image/webp"
+    };
+
     private CreatePostDraft draft = new();
-    private string? recipientError;
+    private readonly List<SelectedPhoto> selectedPhotos = [];
     private string? descriptionError;
+    private string? photoError;
+    private string? persistenceError;
     private ElementReference modalOverlay;
     private bool shouldFocusModal;
     private bool wasOpen;
+    private bool isSubmitting;
 
     protected override void OnParametersSet()
     {
@@ -106,14 +127,6 @@
         }
     }
 
-    private string GetKidChipClass(string slug) => draft.SelectedKidSlugs.Contains(slug)
-        ? "flex items-center gap-2 rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] py-[6px] pr-[14px] pl-[6px] text-sm font-bold text-white"
-        : "flex items-center gap-2 rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] py-[6px] pr-[14px] pl-[6px] text-sm font-bold text-[#6E6359]";
-
-    private string GetRoomChipClass() => draft.IsRoomSelected
-        ? "rounded-full border-[1.5px] border-[#3F362E] bg-[#3F362E] px-4 py-[6px] text-sm font-bold text-white"
-        : "rounded-full border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] px-4 py-[6px] text-sm font-bold text-[#6E6359]";
-
     private string GetKindClass(string kind)
     {
         var colorClass = kind switch
@@ -131,48 +144,75 @@
         return $"rounded-full border-0 px-4 py-2 text-[13.5px] font-extrabold {colorClass} {(draft.Kind == kind ? "ring-2 ring-[#3F362E] ring-offset-2" : string.Empty)}";
     }
 
-    private void ToggleKid(string slug)
-    {
-        draft.IsRoomSelected = false;
-
-        if (!draft.SelectedKidSlugs.Add(slug))
-        {
-            draft.SelectedKidSlugs.Remove(slug);
-        }
-    }
-
-    private void ToggleRoom()
-    {
-        draft.IsRoomSelected = !draft.IsRoomSelected;
-
-        if (draft.IsRoomSelected)
-        {
-            draft.SelectedKidSlugs.Clear();
-        }
-    }
-
     private async Task HandlePublish()
     {
-        recipientError = draft.SelectedKidSlugs.Count == 0 && !draft.IsRoomSelected
-            ? "Selecciona al menos un destinatario."
-            : null;
-        descriptionError = string.IsNullOrWhiteSpace(draft.Description)
-            ? "Escribe una descripción."
+        descriptionError = string.IsNullOrWhiteSpace(draft.Description) || draft.Description.Trim().Length > 1000
+            ? "Escribe entre 1 y 1.000 caracteres."
             : null;
 
-        if (recipientError is not null || descriptionError is not null)
+        if (descriptionError is not null || isSubmitting)
         {
             return;
         }
 
-        await CloseAsync(OnSave);
+        isSubmitting = true;
+        persistenceError = null;
+        try
+        {
+            await PostService.CreateAsync(new CreatePostRequest(
+                PostTypeValues[draft.Kind],
+                draft.Description,
+                selectedPhotos.Select(photo => photo.File).ToArray()));
+            await CloseAsync(OnSave);
+        }
+        catch
+        {
+            persistenceError = "No se pudo publicar. Revisa la conexión e inténtalo de nuevo.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task HandleFilesSelected(InputFileChangeEventArgs args)
+    {
+        photoError = null;
+        if (selectedPhotos.Count + args.FileCount > MaxPhotoCount)
+        {
+            photoError = "Puedes adjuntar como máximo cinco imágenes.";
+            return;
+        }
+
+        var incomingFiles = args.GetMultipleFiles(MaxPhotoCount - selectedPhotos.Count);
+
+        foreach (var file in incomingFiles)
+        {
+            if (!AllowedContentTypes.Contains(file.ContentType) || file.Size > MaxPhotoSize)
+            {
+                photoError = "Cada imagen debe ser JPG, PNG o WebP y pesar como máximo 5 MB.";
+                return;
+            }
+
+            await using var stream = file.OpenReadStream(MaxPhotoSize);
+            await using var memory = new MemoryStream();
+            await stream.CopyToAsync(memory);
+            var previewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(memory.ToArray())}";
+            selectedPhotos.Add(new SelectedPhoto(file, previewUrl));
+        }
+
+    }
+
+    private void RemovePhoto(SelectedPhoto photo)
+    {
+        selectedPhotos.Remove(photo);
     }
 
     private Task HandleCancelAsync() => CloseAsync(OnCancel);
 
     private Task HandleBackdropClickAsync() => CloseAsync(OnCancel);
 
-    private Task HandleKeyDownAsync(KeyboardEventArgs args) => args.Key == "Escape"
+    private Task HandleKeyDownAsync(KeyboardEventArgs args) => args.Key == "Escape" && !isSubmitting
         ? CloseAsync(OnCancel)
         : Task.CompletedTask;
 
@@ -185,15 +225,17 @@
     private void ResetDraft()
     {
         draft = new CreatePostDraft();
-        recipientError = null;
         descriptionError = null;
+        photoError = null;
+        persistenceError = null;
+        selectedPhotos.Clear();
     }
 
     private sealed class CreatePostDraft
     {
-        public HashSet<string> SelectedKidSlugs { get; } = [];
-        public bool IsRoomSelected { get; set; }
         public string Kind { get; set; } = "Comida";
         public string Description { get; set; } = string.Empty;
     }
+
+    private sealed record SelectedPhoto(IBrowserFile File, string PreviewUrl);
 }

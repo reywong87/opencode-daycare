@@ -21,13 +21,22 @@ var supabaseUrl = builder.Configuration["Supabase:Url"]
 var supabaseKey = builder.Configuration["Supabase:AnonKey"]
                   ?? throw new InvalidOperationException("Missing Supabase:AnonKey.");
 
-builder.Services.AddScoped(_ => new Supabase.Client(
-    supabaseUrl,
-    supabaseKey,
-    new Supabase.SupabaseOptions
+builder.Services.AddScoped(_ =>
+{
+    var client = new Supabase.Client(
+        supabaseUrl,
+        supabaseKey,
+        new Supabase.SupabaseOptions
+        {
+            AutoConnectRealtime = false
+        });
+    client.Storage.GetHeaders = () => new Dictionary<string, string>
     {
-        AutoConnectRealtime = false
-    }));
+        ["apikey"] = supabaseKey,
+        ["Authorization"] = $"Bearer {client.Auth.CurrentSession?.AccessToken ?? supabaseKey}"
+    };
+    return client;
+});
 
 var app = builder.Build();
 

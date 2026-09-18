@@ -105,6 +105,7 @@ public sealed class PostService(
             };
             var postResponse = await supabase.From<Post>().Insert(post);
             persistedPost = postResponse.Models.Single();
+            logger.LogInformation("Wall post {PostId} is persisted before image upload.", persistedPost.Id);
 
             await UploadPhotosAsync(persistedPost, request.NewPhotos, uploadedPaths);
         }
@@ -252,8 +253,13 @@ public sealed class PostService(
         {
             var file = files[index];
             var photoId = Guid.NewGuid();
-            var extension = Path.GetExtension(file.Name).ToLowerInvariant();
+            var extension = GetStorageExtension(file.ContentType);
             var path = $"{post.DaycareId}/{post.Id}/{photoId}{extension}";
+            logger.LogInformation(
+                "Uploading wall post image at {StoragePath} with MIME type {ContentType}; authenticated storage session: {HasSession}.",
+                path,
+                file.ContentType,
+                !string.IsNullOrWhiteSpace(supabase.Auth.CurrentSession?.AccessToken));
             await using var stream = file.OpenReadStream(MaxPhotoSize);
             await using var memory = new MemoryStream();
             await stream.CopyToAsync(memory);
@@ -317,4 +323,12 @@ public sealed class PostService(
             }
         }
     }
+
+    private static string GetStorageExtension(string contentType) => contentType.ToLowerInvariant() switch
+    {
+        "image/jpeg" => ".jpg",
+        "image/png" => ".png",
+        "image/webp" => ".webp",
+        _ => throw new ArgumentException("El formato de imagen no es válido.", nameof(contentType))
+    };
 }

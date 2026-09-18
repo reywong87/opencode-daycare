@@ -18,6 +18,6 @@ public sealed class PostPhoto : BaseModel
     [Column("position")]
     public short Position { get; set; }
 
-    [Column("created_at")]
+    [Column("created_at", ignoreOnInsert: true, ignoreOnUpdate: true)]
     public DateTimeOffset CreatedAt { get; set; }
 }

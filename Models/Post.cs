@@ -21,12 +21,12 @@ public sealed class Post : BaseModel
     [Column("body")]
     public string Body { get; set; } = string.Empty;
 
-    [Column("published_at")]
+    [Column("published_at", ignoreOnInsert: true)]
     public DateTimeOffset PublishedAt { get; set; }
 
-    [Column("created_at")]
+    [Column("created_at", ignoreOnInsert: true, ignoreOnUpdate: true)]
     public DateTimeOffset CreatedAt { get; set; }
 
-    [Column("updated_at")]
+    [Column("updated_at", ignoreOnInsert: true, ignoreOnUpdate: true)]
     public DateTimeOffset UpdatedAt { get; set; }
 }
