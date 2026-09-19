@@ -1,0 +1,268 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using OpenDaycare.Dtos
+@using OpenDaycare.Services
+@inject PostService PostService
+
+@if (IsOpen && Post is not null)
+{
+    <div @ref="modalOverlay" @onclick="HandleBackdropClickAsync" @onkeydown="HandleKeyDownAsync" tabindex="-1" class="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#3F362E]/30 px-4 py-8 backdrop-blur-[2px] sm:items-center sm:px-6" role="presentation">
+        <section @onclick:stopPropagation="true" class="w-full max-w-[580px] overflow-hidden rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="dialog" aria-modal="true" aria-labelledby="edit-post-title">
+            <header class="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
+                <button type="button" class="text-[15px] font-bold text-[#94887B]" @onclick="HandleCancelAsync" disabled="@isSubmitting">Cancelar</button>
+                <h2 id="edit-post-title" class="font-fredoka text-lg font-semibold text-[#3F362E]">Editar publicación</h2>
+                <button type="button" class="text-[15px] font-extrabold text-[#D9583C] disabled:cursor-not-allowed disabled:opacity-50" disabled="@isSubmitting" @onclick="HandleSaveAsync">@(isSubmitting ? "Guardando…" : "Guardar")</button>
+            </header>
+
+            <form class="px-[26px] py-6" novalidate @onsubmit:preventDefault="true">
+                <fieldset class="mb-[22px]">
+                    <legend class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">TIPO</legend>
+                    <div class="flex flex-wrap gap-[9px]">
+                        @foreach (var kind in PostKinds)
+                        {
+                            <button type="button" aria-pressed="@(draft.Kind == kind)" class="@GetKindClass(kind)" @onclick="() => draft.Kind = kind">@kind</button>
+                        }
+                    </div>
+                </fieldset>
+
+                <div class="mb-[22px]">
+                    <label class="mb-2.5 block text-xs font-extrabold tracking-[0.7px] text-[#94887B]" for="edit-post-description">DESCRIPCIÓN</label>
+                    <textarea id="edit-post-description" maxlength="1000" placeholder="Cuenta cómo le fue hoy…" @bind="draft.Description" @bind:event="oninput" class="min-h-[120px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[14px] text-[15px] leading-[1.5] text-[#3F362E] outline-none placeholder:text-[#B6A99B] focus:border-[#F2937A]"></textarea>
+                    <p class="mt-1 text-right text-xs text-[#94887B]">@draft.Description.Length/1000</p>
+                    @if (descriptionError is not null)
+                    {
+                        <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@descriptionError</p>
+                    }
+                </div>
+
+                <section aria-labelledby="edit-post-photos-title">
+                    <h3 id="edit-post-photos-title" class="mb-2.5 text-xs font-extrabold tracking-[0.7px] text-[#94887B]">FOTOS</h3>
+                    <div class="flex flex-wrap gap-3">
+                        @foreach (var photo in existingPhotos)
+                        {
+                            <div class="relative size-24 overflow-hidden rounded-[14px] border border-[#ECE0D0] bg-[#F4ECE1] @(retainedPhotoIds.Contains(photo.Id) ? string.Empty : "opacity-45")">
+                                <img src="@photo.SignedUrl" alt="Imagen de la publicación" class="size-full object-cover" />
+                                <button type="button" class="absolute inset-x-1 bottom-1 rounded-full bg-[#3F362E]/80 px-1 py-1 text-xs font-bold text-white" @onclick="() => ToggleRetainedPhoto(photo.Id)">@(retainedPhotoIds.Contains(photo.Id) ? "Quitar" : "Conservar")</button>
+                            </div>
+                        }
+                        @foreach (var photo in newPhotos)
+                        {
+                            <div class="relative size-24 overflow-hidden rounded-[14px] border border-[#ECE0D0] bg-[#F4ECE1]" title="@photo.File.Name">
+                                <img src="@photo.PreviewUrl" alt="Vista previa de @photo.File.Name" class="size-full object-cover" />
+                                <button type="button" class="absolute right-1 top-1 flex size-6 items-center justify-center rounded-full bg-[#3F362E]/80 text-sm font-bold text-white" aria-label="Quitar @photo.File.Name" @onclick="() => RemoveNewPhoto(photo)">×</button>
+                            </div>
+                        }
+                        @if (retainedPhotoIds.Count + newPhotos.Count < MaxPhotoCount)
+                        {
+                            <label class="flex size-24 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]" aria-label="Agregar foto">
+                                <span class="text-[22px] text-[#C5503A]" aria-hidden="true">+</span>
+                                <span class="text-xs">Agregar</span>
+                                <InputFile OnChange="HandleFilesSelected" accept="image/jpeg,image/png,image/webp" multiple class="sr-only" />
+                            </label>
+                        }
+                    </div>
+                    @if (photoError is not null)
+                    {
+                        <p class="mt-1.5 text-[13px] font-semibold text-[#C5503A]">@photoError</p>
+                    }
+                </section>
+
+                @if (persistenceError is not null)
+                {
+                    <p role="alert" class="mt-4 rounded-[12px] bg-[#FBE2DC] px-3 py-2 text-[13px] font-semibold text-[#C5503A]">@persistenceError</p>
+                }
+            </form>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public PostFeedItem? Post { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback OnSave { get; set; }
+
+    private const int MaxPhotoCount = 5;
+    private const long MaxPhotoSize = 5 * 1024 * 1024;
+    private static readonly string[] PostKinds = ["Comida", "Siesta", "Actividad", "Logro", "Ánimo", "Foto", "Anuncio"];
+    private static readonly IReadOnlyDictionary<string, string> PostTypeValues = new Dictionary<string, string>
+    {
+        ["Comida"] = "meal", ["Siesta"] = "nap", ["Actividad"] = "activity", ["Logro"] = "achievement",
+        ["Ánimo"] = "mood", ["Foto"] = "photo", ["Anuncio"] = "announcement"
+    };
+    private static readonly IReadOnlySet<string> AllowedContentTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "image/jpeg", "image/png", "image/webp"
+    };
+
+    private readonly List<PostPhotoItem> existingPhotos = [];
+    private readonly HashSet<Guid> retainedPhotoIds = [];
+    private readonly List<SelectedPhoto> newPhotos = [];
+    private EditPostDraft draft = new();
+    private ElementReference modalOverlay;
+    private string? descriptionError;
+    private string? photoError;
+    private string? persistenceError;
+    private bool isSubmitting;
+    private bool shouldFocusModal;
+    private bool wasOpen;
+    private Guid? loadedPostId;
+
+    protected override void OnParametersSet()
+    {
+        if (IsOpen && Post is not null && (!wasOpen || loadedPostId != Post.Id))
+        {
+            LoadPost(Post);
+            shouldFocusModal = true;
+        }
+
+        wasOpen = IsOpen;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (shouldFocusModal)
+        {
+            shouldFocusModal = false;
+            await modalOverlay.FocusAsync(preventScroll: true);
+        }
+    }
+
+    private void LoadPost(PostFeedItem post)
+    {
+        draft = new EditPostDraft
+        {
+            Kind = PostKinds.FirstOrDefault(kind => PostTypeValues[kind] == post.Type) ?? "Anuncio",
+            Description = post.Body
+        };
+        existingPhotos.Clear();
+        existingPhotos.AddRange(post.Photos.OrderBy(photo => photo.Position));
+        retainedPhotoIds.Clear();
+        retainedPhotoIds.UnionWith(existingPhotos.Select(photo => photo.Id));
+        newPhotos.Clear();
+        descriptionError = null;
+        photoError = null;
+        persistenceError = null;
+        loadedPostId = post.Id;
+    }
+
+    private string GetKindClass(string kind)
+    {
+        var colorClass = kind switch
+        {
+            "Comida" => "bg-[#9A7B1E] text-white", "Siesta" => "bg-[#E7DCF6] text-[#7B5FC0]",
+            "Actividad" => "bg-[#2E89A6] text-white", "Logro" => "bg-[#CFEBD8] text-[#3E9B6C]",
+            "Ánimo" => "bg-[#F9D2DE] text-[#C56486]", "Foto" => "bg-[#FBD8CC] text-[#D9684A]",
+            "Anuncio" => "bg-[#CCD8F4] text-[#4E72C8]", _ => string.Empty
+        };
+        return $"rounded-full border-0 px-4 py-2 text-[13.5px] font-extrabold {colorClass} {(draft.Kind == kind ? "ring-2 ring-[#3F362E] ring-offset-2" : string.Empty)}";
+    }
+
+    private async Task HandleSaveAsync()
+    {
+        descriptionError = string.IsNullOrWhiteSpace(draft.Description) || draft.Description.Trim().Length > 1000
+            ? "Escribe entre 1 y 1.000 caracteres."
+            : null;
+        if (descriptionError is not null || isSubmitting || Post is null)
+        {
+            return;
+        }
+
+        isSubmitting = true;
+        persistenceError = null;
+        try
+        {
+            await PostService.UpdateAsync(new UpdatePostRequest(
+                Post.Id,
+                PostTypeValues[draft.Kind],
+                draft.Description,
+                retainedPhotoIds.ToArray(),
+                newPhotos.Select(photo => photo.File).ToArray()));
+            await CloseAsync(OnSave);
+        }
+        catch
+        {
+            persistenceError = "No se pudo guardar. Revisa la conexión e inténtalo de nuevo.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task HandleFilesSelected(InputFileChangeEventArgs args)
+    {
+        photoError = null;
+        if (retainedPhotoIds.Count + newPhotos.Count + args.FileCount > MaxPhotoCount)
+        {
+            photoError = "Puedes conservar o adjuntar como máximo cinco imágenes.";
+            return;
+        }
+
+        var incomingPhotos = new List<SelectedPhoto>();
+        try
+        {
+            foreach (var file in args.GetMultipleFiles(MaxPhotoCount - retainedPhotoIds.Count - newPhotos.Count))
+            {
+                if (!AllowedContentTypes.Contains(file.ContentType) || file.Size > MaxPhotoSize)
+                {
+                    photoError = "Cada imagen debe ser JPG, PNG o WebP y pesar como máximo 5 MB.";
+                    return;
+                }
+
+                await using var stream = file.OpenReadStream(MaxPhotoSize);
+                await using var memory = new MemoryStream();
+                await stream.CopyToAsync(memory);
+                incomingPhotos.Add(new SelectedPhoto(file, $"data:{file.ContentType};base64,{Convert.ToBase64String(memory.ToArray())}"));
+            }
+        }
+        catch
+        {
+            photoError = "No se pudo cargar una de las imágenes. Inténtalo de nuevo.";
+            return;
+        }
+
+        newPhotos.AddRange(incomingPhotos);
+    }
+
+    private void ToggleRetainedPhoto(Guid photoId)
+    {
+        if (!retainedPhotoIds.Remove(photoId))
+        {
+            retainedPhotoIds.Add(photoId);
+        }
+    }
+
+    private void RemoveNewPhoto(SelectedPhoto photo) => newPhotos.Remove(photo);
+
+    private Task HandleCancelAsync() => isSubmitting ? Task.CompletedTask : CloseAsync(OnCancel);
+
+    private Task HandleBackdropClickAsync() => isSubmitting ? Task.CompletedTask : CloseAsync(OnCancel);
+
+    private Task HandleKeyDownAsync(KeyboardEventArgs args) => args.Key == "Escape" && !isSubmitting
+        ? CloseAsync(OnCancel)
+        : Task.CompletedTask;
+
+    private async Task CloseAsync(EventCallback callback)
+    {
+        existingPhotos.Clear();
+        retainedPhotoIds.Clear();
+        newPhotos.Clear();
+        loadedPostId = null;
+        await callback.InvokeAsync();
+    }
+
+    private sealed class EditPostDraft
+    {
+        public string Kind { get; set; } = "Anuncio";
+        public string Description { get; set; } = string.Empty;
+    }
+
+    private sealed record SelectedPhoto(IBrowserFile File, string PreviewUrl);
+}
