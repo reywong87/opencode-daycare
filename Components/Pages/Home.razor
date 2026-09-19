@@ -1,5 +1,10 @@
 @page "/"
 @using OpenDaycare.Components.Shared
+@using OpenDaycare.Dtos
+@inject PostService PostService
+@inject WallPostUiState WallState
+@inject SupabaseAuthService AuthService
+@implements IDisposable
 
 <PageTitle>OpenDayCare</PageTitle>
 
@@ -26,30 +31,168 @@
         <span class="h-px flex-1 bg-[#E7DAC8]"></span>
     </div>
 
-    <section class="flex flex-col gap-4" aria-label="Publicaciones de hoy">
-        <PostCard Title="Mateo"
-                  Subtitle="14:20 · publicado por vos"
-                  Kind="Logro"
-                  Recipient="familia de Mateo"
-                  Message="¡Usó el orinal solito por primera vez! Estaba feliz de contárselo a todos. Un gran paso."
-                  ReactionCount="3"
-                  CommentCount="1" />
-
-        <PostCard Title="Mateo"
-                  Subtitle="09:40 · publicado por vos"
-                  Kind="Actividad"
-                  Recipient="familia de Mateo"
-                  Message="Pintamos con témperas esta mañana. Mateo eligió el azul para todo y se concentró un montón mezclando colores."
-                  ImageLabel="Foto · pintando con témperas"
-                  ReactionCount="5"
-                  CommentCount="2" />
-
-        <PostCard Title="Anuncio general"
-                  Subtitle="07:50 · publicado por vos"
-                  Kind="Anuncio"
-                  Recipient="toda la sala"
-                  Message="El viernes salimos al parque por la mañana. Recuerden mandar gorra y una botellita de agua."
-                  ReactionCount="8"
-                  CommentCount="0" />
-    </section>
+    @if (isLoading)
+    {
+        <p class="rounded-[18px] border border-[#ECE0D0] bg-[#FFFDF9] px-5 py-6 text-center text-[14px] text-[#94887B]" role="status">Cargando publicaciones…</p>
+    }
+    else if (loadError is not null)
+    {
+        <div class="rounded-[18px] border border-[#EBC7BC] bg-[#FFF8F5] px-5 py-6 text-center" role="alert">
+            <p class="text-[14px] font-semibold text-[#C5503A]">No se pudo cargar el muro.</p>
+            <button type="button" class="mt-3 rounded-full bg-[#D9583C] px-4 py-2 text-[13px] font-extrabold text-white" @onclick="LoadFeedAsync">Reintentar</button>
+        </div>
+    }
+    else if (feed.Count == 0)
+    {
+        <p class="rounded-[18px] border border-dashed border-[#DBCDBA] bg-[#FFFDF9] px-5 py-10 text-center text-[14px] text-[#94887B]">Todavía no hay publicaciones en el muro.</p>
+    }
+    else
+    {
+        <section class="flex flex-col gap-4" aria-label="Publicaciones del muro">
+            @foreach (var post in feed)
+            {
+                <PostCard Title="@post.AuthorName"
+                          Subtitle="@FormatPublishedAt(post.PublishedAt)"
+                          Kind="@GetPostKind(post.Type)"
+                          Recipient="la guardería"
+                          Message="@post.Body"
+                          Photos="@post.Photos"
+                          CanManage="@IsAuthor(post)"
+                          OnEditClick="@(() => RequestEdit(post))"
+                          OnDeleteClick="@(() => RequestDelete(post))" />
+            }
+        </section>
+    }
 </div>
+
+<DeletePostDialog IsOpen="pendingDelete is not null"
+                  Post="pendingDelete"
+                  IsDeleting="isDeleting"
+                  ErrorMessage="@deleteError"
+                  OnCancel="CancelDelete"
+                  OnConfirm="ConfirmDeleteAsync" />
+
+@code {
+    private readonly List<PostFeedItem> feed = [];
+    private bool isLoading = true;
+    private string? loadError;
+    private Guid? currentUserId;
+    private PostFeedItem? pendingDelete;
+    private string? deleteError;
+    private bool isDeleting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        WallState.PostChanged += HandlePostChanged;
+        WallState.DeleteRequested += HandleDeleteRequested;
+        try
+        {
+            currentUserId = (await AuthService.GetAuthenticatedUserAsync())?.Id;
+        }
+        catch
+        {
+            currentUserId = null;
+        }
+
+        await LoadFeedAsync();
+    }
+
+    private async Task LoadFeedAsync()
+    {
+        isLoading = true;
+        loadError = null;
+
+        try
+        {
+            feed.Clear();
+            feed.AddRange(await PostService.GetFeedAsync());
+        }
+        catch
+        {
+            loadError = "No se pudo cargar el muro.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void HandlePostChanged() => _ = InvokeAsync(async () =>
+    {
+        await LoadFeedAsync();
+        StateHasChanged();
+    });
+
+    private bool IsAuthor(PostFeedItem post) => currentUserId == post.AuthorId;
+
+    private void RequestEdit(PostFeedItem post) => WallState.RequestEdit(post);
+
+    private void RequestDelete(PostFeedItem post) => WallState.RequestDelete(post);
+
+    private void HandleDeleteRequested(PostFeedItem post)
+    {
+        _ = InvokeAsync(() =>
+        {
+            pendingDelete = post;
+            deleteError = null;
+            StateHasChanged();
+        });
+    }
+
+    private void CancelDelete()
+    {
+        if (isDeleting)
+        {
+            return;
+        }
+
+        pendingDelete = null;
+        deleteError = null;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (pendingDelete is null || isDeleting)
+        {
+            return;
+        }
+
+        isDeleting = true;
+        deleteError = null;
+        try
+        {
+            await PostService.DeleteAsync(pendingDelete.Id);
+            pendingDelete = null;
+            await LoadFeedAsync();
+        }
+        catch
+        {
+            deleteError = "No se pudo eliminar. Revisa la conexión e inténtalo de nuevo.";
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+    }
+
+    private static string GetPostKind(string type) => type switch
+    {
+        "meal" => "Comida",
+        "nap" => "Siesta",
+        "activity" => "Actividad",
+        "achievement" => "Logro",
+        "mood" => "Ánimo",
+        "photo" => "Foto",
+        "announcement" => "Anuncio",
+        _ => type
+    };
+
+    private static string FormatPublishedAt(DateTimeOffset publishedAt) =>
+        publishedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm");
+
+    public void Dispose()
+    {
+        WallState.PostChanged -= HandlePostChanged;
+        WallState.DeleteRequested -= HandleDeleteRequested;
+    }
+}

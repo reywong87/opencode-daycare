@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Components
+@using OpenDaycare.Dtos
 
 <article class="rounded-[20px] border border-[#ECE0D0] bg-[#FFFDF9] px-[22px] py-5 shadow-[0_4px_16px_-12px_rgba(120,90,60,0.5)]">
     <header class="mb-3.5 flex items-center gap-3">
@@ -28,7 +29,16 @@
     <p class="mb-2.5 text-[12.5px] text-[#A89A8B]">Para: @Recipient</p>
     <p class="text-[15.5px] leading-[1.55] text-[#4A4038]">@Message</p>
 
-    @if (!string.IsNullOrWhiteSpace(ImageLabel))
+    @if (Photos is { Count: > 0 })
+    {
+        <div class="mt-3.5 grid grid-cols-2 gap-2 overflow-hidden rounded-2xl">
+            @foreach (var photo in Photos)
+            {
+                <img src="@photo.SignedUrl" alt="Imagen de la publicación" class="max-h-[240px] min-h-[140px] w-full object-cover @(Photos.Count == 1 ? "col-span-2" : string.Empty)" />
+            }
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ImageLabel))
     {
         <div class="mt-3.5 flex h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]">
             <svg class="size-[30px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -54,7 +64,11 @@
             @CommentCount
         </button>
         <span class="flex-1"></span>
-        <button type="button" class="text-sm font-extrabold text-[#C5503A]" @onclick="OnEditClick">Editar</button>
+        @if (CanManage)
+        {
+            <button type="button" class="text-sm font-extrabold text-[#C5503A]" @onclick="OnEditClick">Editar</button>
+            <button type="button" class="text-sm font-extrabold text-[#94887B]" @onclick="OnDeleteClick">Eliminar</button>
+        }
     </footer>
 </article>
 
@@ -81,6 +95,9 @@
     public string? ImageLabel { get; set; }
 
     [Parameter]
+    public IReadOnlyList<PostPhotoItem>? Photos { get; set; }
+
+    [Parameter]
     public int ReactionCount { get; set; }
 
     [Parameter]
@@ -94,6 +111,12 @@
 
     [Parameter]
     public EventCallback OnEditClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnDeleteClick { get; set; }
+
+    [Parameter]
+    public bool CanManage { get; set; }
 
     private bool IsAnnouncement => Kind == "Anuncio";
 

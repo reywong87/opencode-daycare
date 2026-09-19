@@ -13,6 +13,7 @@
 - Crear `public.users` vinculada uno a uno a `auth.users` y opcionalmente a `public.daycares`.
 - Añadir un trigger para mantener `updated_at` automáticamente.
 - Habilitar RLS para que cada usuario autenticado lea y actualice únicamente su propio perfil.
+- Permitir que perfiles activos lean los perfiles activos de su misma guardería para identificar autores del muro.
 - Limitar las actualizaciones propias a `full_name`, `avatar_url`, `notify_on_post` y `daily_summary_enabled`.
 - Crear `rey@google.com` mediante signup público sin guardar la contraseña en Git.
 - Crear mediante una migración de datos el perfil `staff` activo de Rey asociado a `Guardería Soles`.
@@ -22,7 +23,7 @@
 
 - Trigger de creación automática de perfiles al insertar en `auth.users`.
 - Invitaciones, altas de padres, asignación de roles y pertenencia a guarderías.
-- Autorización de staff o admin sobre otros perfiles de su guardería.
+- Gestión de perfiles, roles o estados de otros usuarios de su guardería.
 - Integración de Supabase Auth, sesiones o perfiles en Blazor.
 - Verificación del inicio de sesión y confirmación de correo de `rey@google.com`.
 - Los enums `relationship_type`, `invitation_status`, `post_type` y `child_status`.
@@ -56,6 +57,7 @@ Tabla: `public.users`.
 - `authenticated` podrá seleccionar únicamente la fila cuyo `id` sea `auth.uid()`.
 - `authenticated` podrá actualizar únicamente su propia fila y solo las columnas autorizadas.
 - La cuenta inicial tendrá `full_name = 'Rey'`, `role = 'staff'`, `status = 'active'` y la guardería `Guardería Soles`.
+- Los perfiles activos podrán leer perfiles activos de su misma guardería para mostrar el nombre de autores, sin permisos de escritura sobre otros perfiles.
 
 ## Implementation plan
 
@@ -64,7 +66,8 @@ Tabla: `public.users`.
 3. Preparar, aplicar y versionar la migración que crea `public.users`, sus claves foráneas, restricciones, trigger de `updated_at`, RLS, políticas y privilegios por columna.
 4. Crear `rey@google.com` con signup público usando la contraseña acordada fuera de archivos versionados.
 5. Preparar, aplicar y versionar la migración de datos que localiza el UUID de `auth.users` por el email `rey@google.com` e inserta el perfil staff sin UUID ni contraseña fijos.
-6. Verificar la estructura, restricciones, permisos, perfil staff e historial de migraciones; revisar los asesores nuevamente y ejecutar `dotnet build`.
+6. Crear, aplicar y versionar la política de lectura de perfiles activos de la misma guardería para identificar autores de publicaciones.
+7. Verificar la estructura, restricciones, permisos, perfil staff e historial de migraciones; revisar los asesores nuevamente y ejecutar `dotnet build`.
 
 ## Acceptance criteria
 
@@ -80,6 +83,7 @@ Tabla: `public.users`.
 - [x] Actualizar un perfil modifica `updated_at`.
 - [x] RLS está habilitado en `public.users`.
 - [x] Un usuario autenticado puede leer únicamente su propio perfil.
+- [x] Un usuario autenticado con perfil activo puede leer perfiles activos de su misma guardería para identificar autores.
 - [x] Un usuario autenticado puede actualizar únicamente su propio `full_name`, `avatar_url` y preferencias.
 - [x] Un usuario autenticado no puede insertar, eliminar ni modificar su `id`, `daycare_id`, `role`, `status`, `created_at` o `updated_at`.
 - [x] `rey@google.com` existe en `auth.users` y tiene un perfil asociado con `full_name` `Rey`, rol `staff`, estado `active` y `Guardería Soles`.
@@ -95,6 +99,7 @@ Tabla: `public.users`.
 - **Sí:** `full_name` obligatorio y no vacío. El perfil debe identificar a la persona.
 - **Sí:** `updated_at` automático mediante trigger. Evita que cada cliente deba mantener la marca de modificación.
 - **Sí:** acceso de cliente limitado al perfil propio. Protege información de otros usuarios mientras no existe autorización por guardería.
+- **Sí:** lectura de perfiles activos de la misma guardería. El muro necesita resolver el nombre del autor sin duplicarlo en cada publicación; la escritura sigue limitada al perfil propio.
 - **Sí:** permisos de actualización por columna. RLS identifica la fila y los privilegios de columna protegen rol, estado y pertenencia.
 - **Sí:** cuenta staff creada por signup público y perfil sembrado desde una migración por email. No requiere UUID ni contraseña fijos en Git.
 - **No:** trigger de perfil desde `auth.users`. La asignación segura de rol y guardería queda para invitaciones.
@@ -114,6 +119,6 @@ Tabla: `public.users`.
 
 - Creación automática de perfiles o altas normales de usuarios.
 - Invitaciones y asociaciones de padres, niños o guarderías.
-- Lectura de usuarios de la misma guardería por staff o admin.
+- Gestión de perfiles, roles o estados de otros usuarios.
 - Autenticación real desde Blazor y verificación de login.
 - Los enums y tablas de niños, publicaciones, reacciones o invitaciones.
