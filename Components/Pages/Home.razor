@@ -65,15 +65,26 @@
     }
 </div>
 
+<DeletePostDialog IsOpen="pendingDelete is not null"
+                  Post="pendingDelete"
+                  IsDeleting="isDeleting"
+                  ErrorMessage="@deleteError"
+                  OnCancel="CancelDelete"
+                  OnConfirm="ConfirmDeleteAsync" />
+
 @code {
     private readonly List<PostFeedItem> feed = [];
     private bool isLoading = true;
     private string? loadError;
     private Guid? currentUserId;
+    private PostFeedItem? pendingDelete;
+    private string? deleteError;
+    private bool isDeleting;
 
     protected override async Task OnInitializedAsync()
     {
         WallState.PostChanged += HandlePostChanged;
+        WallState.DeleteRequested += HandleDeleteRequested;
         try
         {
             currentUserId = (await AuthService.GetAuthenticatedUserAsync())?.Id;
@@ -118,6 +129,52 @@
 
     private void RequestDelete(PostFeedItem post) => WallState.RequestDelete(post);
 
+    private void HandleDeleteRequested(PostFeedItem post)
+    {
+        _ = InvokeAsync(() =>
+        {
+            pendingDelete = post;
+            deleteError = null;
+            StateHasChanged();
+        });
+    }
+
+    private void CancelDelete()
+    {
+        if (isDeleting)
+        {
+            return;
+        }
+
+        pendingDelete = null;
+        deleteError = null;
+    }
+
+    private async Task ConfirmDeleteAsync()
+    {
+        if (pendingDelete is null || isDeleting)
+        {
+            return;
+        }
+
+        isDeleting = true;
+        deleteError = null;
+        try
+        {
+            await PostService.DeleteAsync(pendingDelete.Id);
+            pendingDelete = null;
+            await LoadFeedAsync();
+        }
+        catch
+        {
+            deleteError = "No se pudo eliminar. Revisa la conexión e inténtalo de nuevo.";
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+    }
+
     private static string GetPostKind(string type) => type switch
     {
         "meal" => "Comida",
@@ -136,5 +193,6 @@
     public void Dispose()
     {
         WallState.PostChanged -= HandlePostChanged;
+        WallState.DeleteRequested -= HandleDeleteRequested;
     }
 }

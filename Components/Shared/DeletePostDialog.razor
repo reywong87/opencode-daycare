@@ -1,0 +1,45 @@
+@using OpenDaycare.Dtos
+
+@if (IsOpen && Post is not null)
+{
+    <div @onclick="HandleBackdropClick" @onkeydown="HandleKeyDown" tabindex="-1" class="fixed inset-0 z-50 flex items-center justify-center bg-[#3F362E]/30 px-4 backdrop-blur-[2px]" role="presentation">
+        <section @onclick:stopPropagation="true" class="w-full max-w-[420px] rounded-[24px] border border-[#ECE0D0] bg-[#FBF4EC] p-6 shadow-[0_20px_50px_-24px_rgba(63,54,46,0.35)]" role="alertdialog" aria-modal="true" aria-labelledby="delete-post-title" aria-describedby="delete-post-description">
+            <h2 id="delete-post-title" class="font-fredoka text-xl font-semibold text-[#3F362E]">¿Eliminar publicación?</h2>
+            <p id="delete-post-description" class="mt-2 text-[14px] leading-[1.5] text-[#6E6359]">Esta acción eliminará la publicación y sus imágenes. No se puede deshacer.</p>
+            @if (ErrorMessage is not null)
+            {
+                <p class="mt-4 rounded-[12px] bg-[#FBE2DC] px-3 py-2 text-[13px] font-semibold text-[#C5503A]" role="alert">@ErrorMessage</p>
+            }
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" class="rounded-full border border-[#DBCDBA] px-4 py-2 text-[13px] font-extrabold text-[#6E6359] disabled:cursor-not-allowed disabled:opacity-50" disabled="@IsDeleting" @onclick="OnCancel">Cancelar</button>
+                <button type="button" class="rounded-full bg-[#C5503A] px-4 py-2 text-[13px] font-extrabold text-white disabled:cursor-wait disabled:opacity-60" disabled="@IsDeleting" @onclick="OnConfirm">@(IsDeleting ? "Eliminando…" : "Eliminar")</button>
+            </div>
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public PostFeedItem? Post { get; set; }
+
+    [Parameter]
+    public bool IsDeleting { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    private Task HandleBackdropClick() => IsDeleting ? Task.CompletedTask : OnCancel.InvokeAsync();
+
+    private Task HandleKeyDown(KeyboardEventArgs args) => args.Key == "Escape" && !IsDeleting
+        ? OnCancel.InvokeAsync()
+        : Task.CompletedTask;
+}
