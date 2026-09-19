@@ -1,6 +1,6 @@
 # SPEC 10 — Publicaciones del muro
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 06, SPEC 07
 > **Date:** 2026-09-17
 > **Objective:** Permitir que staff y administradores publiquen, editen y eliminen entradas con texto obligatorio e imágenes opcionales en el muro de su guardería.
@@ -118,26 +118,26 @@ Las políticas RLS de `posts` y `post_photos` permitirán `SELECT` a perfiles ac
 
 ## Acceptance criteria
 
-- [ ] `dotnet build` termina sin errores.
-- [ ] La migración añade `mood` al enum `public.post_type` sin eliminar los valores existentes.
-- [ ] La migración crea `public.posts` y `public.post_photos` con RLS habilitada, restricciones de texto, orden de foto y claves foráneas indicadas.
-- [ ] `post-images` es un bucket privado y no se almacena ninguna URL pública en la base de datos.
-- [ ] Un perfil activo `staff` o `admin` puede crear una entrada en su propia guardería.
-- [ ] Un perfil `parent`, inactivo o de otra guardería no puede crear entradas mediante RLS.
-- [ ] Un perfil activo `staff`, `admin` o `parent` solo puede leer entradas e imágenes de su propia guardería.
-- [ ] Un usuario no puede leer por Data API ni por Storage una entrada o imagen de otra guardería.
-- [ ] Solo el autor activo `staff` o `admin` puede actualizar o eliminar su propia entrada e imágenes.
-- [ ] El formulario rechaza texto vacío o de más de 1.000 caracteres.
-- [ ] El formulario rechaza más de cinco imágenes, archivos que no sean JPG, PNG o WebP, y archivos de más de 5 MB.
-- [ ] Una entrada válida sin imágenes se publica y aparece arriba del muro sin recargar el navegador.
-- [ ] Una entrada válida con entre una y cinco imágenes se publica, conserva su orden y muestra las imágenes a los lectores autorizados.
-- [ ] Cada entrada muestra el nombre de su autor y su fecha y hora de publicación.
-- [ ] El autor puede editar texto, tipo y las imágenes de su entrada sin superar cinco imágenes.
-- [ ] El autor ve `Editar` y `Eliminar`; los demás lectores no ven esas acciones.
-- [ ] Eliminar solicita confirmación y, al confirmarse, elimina la entrada y sus archivos de Storage.
-- [ ] Un fallo al cargar, publicar, editar o eliminar muestra un error recuperable y no descarta silenciosamente el contenido ni elimina visualmente una entrada no borrada.
-- [ ] El muro muestra un estado de carga, un estado vacío y `Reintentar` ante un error inicial.
-- [ ] A 1440px y 390px, el muro, las galerías, los modales y sus estados no producen desbordamiento horizontal y siguen siendo operables por teclado.
+- [x] `dotnet build` termina sin errores.
+- [x] La migración añade `mood` al enum `public.post_type` sin eliminar los valores existentes.
+- [x] La migración crea `public.posts` y `public.post_photos` con RLS habilitada, restricciones de texto, orden de foto y claves foráneas indicadas.
+- [x] `post-images` es un bucket privado y no se almacena ninguna URL pública en la base de datos.
+- [x] Un perfil activo `staff` o `admin` puede crear una entrada en su propia guardería.
+- [x] Un perfil `parent`, inactivo o de otra guardería no puede crear entradas mediante RLS.
+- [x] Un perfil activo `staff`, `admin` o `parent` solo puede leer entradas e imágenes de su propia guardería.
+- [x] Un usuario no puede leer por Data API ni por Storage una entrada o imagen de otra guardería.
+- [x] Solo el autor activo `staff` o `admin` puede actualizar o eliminar su propia entrada e imágenes.
+- [x] El formulario rechaza texto vacío o de más de 1.000 caracteres.
+- [x] El formulario rechaza más de cinco imágenes, archivos que no sean JPG, PNG o WebP, y archivos de más de 5 MB.
+- [x] Una entrada válida sin imágenes se publica y aparece arriba del muro sin recargar el navegador.
+- [x] Una entrada válida con entre una y cinco imágenes se publica, conserva su orden y muestra las imágenes a los lectores autorizados.
+- [x] Cada entrada muestra el nombre de su autor y su fecha y hora de publicación.
+- [x] El autor puede editar texto, tipo y las imágenes de su entrada sin superar cinco imágenes.
+- [x] El autor ve `Editar` y `Eliminar`; los demás lectores no ven esas acciones.
+- [x] Eliminar solicita confirmación y, al confirmarse, elimina la entrada y sus archivos de Storage.
+- [x] Un fallo al cargar, publicar, editar o eliminar muestra un error recuperable y no descarta silenciosamente el contenido ni elimina visualmente una entrada no borrada.
+- [x] El muro muestra un estado de carga, un estado vacío y `Reintentar` ante un error inicial.
+- [x] A 1440px y 390px, el muro, las galerías, los modales y sus estados no producen desbordamiento horizontal y siguen siendo operables por teclado.
 
 ## Decisions
 
