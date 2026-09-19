@@ -64,7 +64,11 @@
             @CommentCount
         </button>
         <span class="flex-1"></span>
-        <button type="button" class="text-sm font-extrabold text-[#C5503A]" @onclick="OnEditClick">Editar</button>
+        @if (CanManage)
+        {
+            <button type="button" class="text-sm font-extrabold text-[#C5503A]" @onclick="OnEditClick">Editar</button>
+            <button type="button" class="text-sm font-extrabold text-[#94887B]" @onclick="OnDeleteClick">Eliminar</button>
+        }
     </footer>
 </article>
 
@@ -107,6 +111,12 @@
 
     [Parameter]
     public EventCallback OnEditClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnDeleteClick { get; set; }
+
+    [Parameter]
+    public bool CanManage { get; set; }
 
     private bool IsAnnouncement => Kind == "Anuncio";
 

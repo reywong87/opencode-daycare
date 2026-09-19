@@ -3,8 +3,8 @@
 @using OpenDaycare.Dtos
 @inject PostService PostService
 @inject WallPostUiState WallState
+@inject SupabaseAuthService AuthService
 @implements IDisposable
-@rendermode InteractiveServer
 
 <PageTitle>OpenDayCare</PageTitle>
 
@@ -56,7 +56,10 @@
                           Kind="@GetPostKind(post.Type)"
                           Recipient="la guardería"
                           Message="@post.Body"
-                          Photos="@post.Photos" />
+                          Photos="@post.Photos"
+                          CanManage="@IsAuthor(post)"
+                          OnEditClick="@(() => RequestEdit(post))"
+                          OnDeleteClick="@(() => RequestDelete(post))" />
             }
         </section>
     }
@@ -66,10 +69,20 @@
     private readonly List<PostFeedItem> feed = [];
     private bool isLoading = true;
     private string? loadError;
+    private Guid? currentUserId;
 
     protected override async Task OnInitializedAsync()
     {
         WallState.PostChanged += HandlePostChanged;
+        try
+        {
+            currentUserId = (await AuthService.GetAuthenticatedUserAsync())?.Id;
+        }
+        catch
+        {
+            currentUserId = null;
+        }
+
         await LoadFeedAsync();
     }
 
@@ -93,7 +106,17 @@
         }
     }
 
-    private void HandlePostChanged() => _ = InvokeAsync(LoadFeedAsync);
+    private void HandlePostChanged() => _ = InvokeAsync(async () =>
+    {
+        await LoadFeedAsync();
+        StateHasChanged();
+    });
+
+    private bool IsAuthor(PostFeedItem post) => currentUserId == post.AuthorId;
+
+    private void RequestEdit(PostFeedItem post) => WallState.RequestEdit(post);
+
+    private void RequestDelete(PostFeedItem post) => WallState.RequestDelete(post);
 
     private static string GetPostKind(string type) => type switch
     {
