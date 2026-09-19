@@ -1,17 +1,58 @@
+@implements IDisposable
+@using OpenDaycare.Dtos
+@inject WallPostUiState WallState
+
 <Sidebar OnNewPost="OpenCreatePostModal" />
 
-<CreatePostModal IsOpen="isCreatePostModalOpen" OnCancel="CloseCreatePostModal" OnSave="CloseCreatePostModal" />
+<CreatePostModal IsOpen="isCreatePostModalOpen" OnCancel="CloseCreatePostModal" OnSave="HandlePostSaved" />
+<EditPostModal IsOpen="isEditPostModalOpen" Post="postBeingEdited" OnCancel="CloseEditPostModal" OnSave="HandlePostSaved" />
 
 @code {
     private bool isCreatePostModalOpen;
+    private bool isEditPostModalOpen;
+    private PostFeedItem? postBeingEdited;
+
+    protected override void OnInitialized()
+    {
+        WallState.EditRequested += OpenEditPostModal;
+    }
 
     private void OpenCreatePostModal()
     {
+        isEditPostModalOpen = false;
+        postBeingEdited = null;
         isCreatePostModalOpen = true;
     }
 
     private void CloseCreatePostModal()
     {
         isCreatePostModalOpen = false;
+    }
+
+    private void OpenEditPostModal(PostFeedItem post)
+    {
+        isCreatePostModalOpen = false;
+        postBeingEdited = post;
+        isEditPostModalOpen = true;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void CloseEditPostModal()
+    {
+        isEditPostModalOpen = false;
+        postBeingEdited = null;
+    }
+
+    private void HandlePostSaved()
+    {
+        isCreatePostModalOpen = false;
+        isEditPostModalOpen = false;
+        postBeingEdited = null;
+        WallState.NotifyPostChanged();
+    }
+
+    public void Dispose()
+    {
+        WallState.EditRequested -= OpenEditPostModal;
     }
 }

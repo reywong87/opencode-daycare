@@ -12,6 +12,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddDataProtection();
 builder.Services.AddScoped<ChildrenService>();
 builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<WallPostUiState>();
 builder.Services.AddScoped<SupabaseAuthService>();
 builder.Services.AddScoped<SupabaseAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(serviceProvider => serviceProvider.GetRequiredService<SupabaseAuthenticationStateProvider>());
